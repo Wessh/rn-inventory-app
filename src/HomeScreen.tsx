@@ -173,35 +173,34 @@ const HomeScreen = () => {
             mode="outlined"
           />
 
-          <View style={styles.buttonContainer}>
+          <View style={styles.filterContainer}>
             <Button mode="contained" onPress={showFilterDialog}>Filtros</Button>
-          </View>
-
-          <View style={styles.filterInfoContainer}>
-            {selectedCategory !== '' && (
-              <View style={styles.filterItemContainer}>
-                <Text>Categoria: {selectedCategory}</Text>
-                <TouchableOpacity onPress={() => clearCategoryFilter()}>
-                  <Text style={styles.clearFilterButton}>X</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-            {selectedMarca !== '' && (
-              <View style={styles.filterItemContainer}>
-                <Text>Marca: {selectedMarca}</Text>
-                <TouchableOpacity onPress={() => clearMarcaFilter()}>
-                  <Text style={styles.clearFilterButton}>X</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-            {selectedQuantity !== '' && (
-              <View style={styles.filterItemContainer}>
-                <Text>Quantidade: {selectedQuantity} ({selectedQuantityFilter})</Text>
-                <TouchableOpacity onPress={() => clearQuantityFilter()}>
-                  <Text style={styles.clearFilterButton}>X</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+            <View style={styles.filterInfoContainer}>
+              {selectedCategory !== '' && (
+                <View style={styles.filterItemContainer}>
+                  <Text>Categoria: {selectedCategory}</Text>
+                  <TouchableOpacity onPress={() => clearCategoryFilter()}>
+                    <Text style={styles.clearFilterButton}>X</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              {selectedMarca !== '' && (
+                <View style={styles.filterItemContainer}>
+                  <Text>Marca: {selectedMarca}</Text>
+                  <TouchableOpacity onPress={() => clearMarcaFilter()}>
+                    <Text style={styles.clearFilterButton}>X</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              {selectedQuantity !== '' && (
+                <View style={styles.filterItemContainer}>
+                  <Text>Quantidade: {selectedQuantity} ({selectedQuantityFilter})</Text>
+                  <TouchableOpacity onPress={() => clearQuantityFilter()}>
+                    <Text style={styles.clearFilterButton}>X</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
           </View>
 
           <FlatList
@@ -308,6 +307,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center',
   },
   searchInput: {
     marginBottom: 10,
@@ -337,6 +337,8 @@ const styles = StyleSheet.create({
     color: 'red',
   },
   filterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 20,
   },
   filterTitle: {
@@ -394,7 +396,7 @@ const styles = StyleSheet.create({
   filterInfoContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 20,
+    marginLeft: 10,
   },
   filterItemContainer: {
     flexDirection: 'row',
