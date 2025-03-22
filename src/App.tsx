@@ -1,21 +1,29 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Button } from 'react-native';
+import { openDatabase, insertData, closeDatabase, dropUsuariosTable } from './database/simple_db'; // Importando a conexão com o banco de dados
 
 export default function App(): JSX.Element {
-let nome = 'João';
-let idade = 20;
+let nome = 'LaParfun';
+let marca = 'Pernejo';
+let categoria = 'Perfume';
+
   return (
     <View style={styles.container}>
       <Text>Tudo é uma mentira</Text>
       <Button 
       title="Clique aqui" 
-      onPress={() => 
-      alert(`Nome: ${nome} \nIdade: ${idade}`)
-      } />
+      onPress={async () => {
+        await openDatabase();
+        await insertData(nome, marca, categoria);
+        await dropUsuariosTable();
+        await closeDatabase();
+        }} />
       <StatusBar style="auto" />
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
