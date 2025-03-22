@@ -30,11 +30,23 @@ const HomeScreen = () => {
     loadFilters();
   }, []);
 
+  useEffect(() => {
+    loadInventory();
+  }, [search, selectedCategory, selectedMarca, selectedQuantity]);
+
   const loadInventory = async () => {
     try {
       await openDatabase();
       const data = await getInventoryByFilters(selectedCategory, selectedMarca, selectedQuantity);
-      setInventory(data);
+      let filteredData = data;
+      if (search) {
+        filteredData = data.filter(item =>
+          item.nome.toLowerCase().includes(search.toLowerCase()) ||
+          item.marca.toLowerCase().includes(search.toLowerCase()) ||
+          item.categoria.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+      setInventory(filteredData);
     } catch (error) {
       console.error('Erro ao carregar o inventário:', error);
     }
