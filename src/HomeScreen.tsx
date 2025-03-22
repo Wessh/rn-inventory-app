@@ -115,17 +115,17 @@ const HomeScreen = () => {
   const renderItem = ({ item }: { item: InventoryItem }) => (
     <View style={styles.itemContainer}>
       <TouchableOpacity style={styles.itemInfo} onPress={() => handleSelectItem(item)}>
-        <Text>Nome: {item.nome}</Text>
-        <Text>Marca: {item.marca}</Text>
-        <Text>Categoria: {item.categoria}</Text>
-        <Text>Quantidade: {item.quantidade}</Text>
+        <Text style={styles.itemName}>Nome: {item.nome}</Text>
+        <Text style={styles.itemDetails}>Marca: {item.marca}</Text>
+        <Text style={styles.itemDetails}>Categoria: {item.categoria}</Text>
+        <Text style={styles.itemDetails}>Quantidade: {item.quantidade}</Text>
       </TouchableOpacity>
       <View style={styles.itemButtons}>
-        <TouchableOpacity style={{ marginHorizontal: 8 }} onPress={() => handleSelectItem(item)}>
-          <MaterialCommunityIcons name="pencil" size={24} color="blue" />
+        <TouchableOpacity style={styles.editButton} onPress={() => handleSelectItem(item)}>
+          <MaterialCommunityIcons name="pencil" size={20} color="#3498db" />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleDeleteItem(item.id)}>
-          <MaterialCommunityIcons name="trash-can" size={24} color="red" />
+          <MaterialCommunityIcons name="trash-can" size={20} color="#e74c3c" />
         </TouchableOpacity>
       </View>
     </View>
@@ -178,7 +178,7 @@ const HomeScreen = () => {
             <View style={styles.filterInfoContainer}>
               {selectedCategory !== '' && (
                 <View style={styles.filterItemContainer}>
-                  <Text>Categoria: {selectedCategory}</Text>
+                  <Text style={styles.filterText}>Categoria: {selectedCategory}</Text>
                   <TouchableOpacity onPress={() => clearCategoryFilter()}>
                     <Text style={styles.clearFilterButton}>X</Text>
                   </TouchableOpacity>
@@ -186,7 +186,7 @@ const HomeScreen = () => {
               )}
               {selectedMarca !== '' && (
                 <View style={styles.filterItemContainer}>
-                  <Text>Marca: {selectedMarca}</Text>
+                  <Text style={styles.filterText}>Marca: {selectedMarca}</Text>
                   <TouchableOpacity onPress={() => clearMarcaFilter()}>
                     <Text style={styles.clearFilterButton}>X</Text>
                   </TouchableOpacity>
@@ -194,7 +194,7 @@ const HomeScreen = () => {
               )}
               {selectedQuantity !== '' && (
                 <View style={styles.filterItemContainer}>
-                  <Text>Quantidade: {selectedQuantity} ({selectedQuantityFilter})</Text>
+                  <Text style={styles.filterText}>Quantidade: {selectedQuantity} ({selectedQuantityFilter})</Text>
                   <TouchableOpacity onPress={() => clearQuantityFilter()}>
                     <Text style={styles.clearFilterButton}>X</Text>
                   </TouchableOpacity>
@@ -203,11 +203,15 @@ const HomeScreen = () => {
             </View>
           </View>
 
-          <FlatList
-            data={inventory}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-          />
+          <View style={styles.listContainer}>
+            <FlatList
+              data={inventory}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id.toString()}
+              contentContainerStyle={styles.listContentContainer}
+            />
+          </View>
+
           <AddItemModal
             visible={modalVisible}
             onClose={handleCloseModal}
@@ -298,61 +302,108 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: '#f4f6fc', // Cor de fundo geral
   },
   container: {
     flex: 1,
-    padding: 20,
+    padding: 8,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+    color: '#34495e', // Cor do título
   },
   searchInput: {
-    marginBottom: 10,
+    marginBottom: 15,
+    backgroundColor: '#fff',
   },
-  buttonContainer: {
+  filterContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  filterInfoContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginLeft: 10,
+  },
+  filterItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 10,
+    backgroundColor: '#e0e0e0',
+    padding: 8,
+    borderRadius: 5,
+  },
+  filterText: {
+    fontSize: 14,
+    color: '#34495e',
+  },
+  clearFilterButton: {
+    color: '#e74c3c',
+    marginLeft: 5,
+    fontWeight: 'bold',
   },
   itemContainer: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: 100,
+    backgroundColor: '#fff',
+    padding: 12, // Diminui o padding
+    borderRadius: 8, // Diminui o borderRadius
+    marginBottom: 8, // Diminui o marginBottom
+    marginHorizontal: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 }, // Diminui a sombra
+    shadowOpacity: 0.1,
+    shadowRadius: 2, // Diminui o raio da sombra
+    elevation: 2, // Diminui a elevação
+    flexDirection: 'row', // Alinha os itens horizontalmente
+    justifyContent: 'space-between', // Espaço entre os itens
+    alignItems: 'center', // Centraliza verticalmente
+    paddingHorizontal: 20, // Adiciona padding horizontal
   },
   itemInfo: {
     flex: 1,
   },
+  itemName: {
+    fontSize: 16, // Diminui o tamanho da fonte
+    fontWeight: 'bold',
+    color: '#2c3e50', // Cor do nome do item
+    marginBottom: 3, // Diminui o marginBottom
+  },
+  itemDetails: {
+    fontSize: 14, // Diminui o tamanho da fonte
+    color: '#7f8c8d', // Cor dos detalhes do item
+  },
   itemButtons: {
     flexDirection: 'row',
+    alignItems: 'center', // Centraliza verticalmente
+    justifyContent: 'flex-end', // Alinha os ícones à direita
+  },
+  editButton: {
+    marginHorizontal: 6, // Diminui a margem
   },
   deleteIcon: {
     fontSize: 20,
     color: 'red',
   },
-  filterContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
+  listContainer: {
+    backgroundColor: '#ecf0f1', // Cor de fundo da lista
+    flex: 1, // Garante que a lista ocupe o espaço restante
+    paddingTop: 10,
+    borderRadius: 10,
+    marginHorizontal: 0, // Adiciona margem horizontal
+    marginBottom: 10, // Adiciona margem inferior
   },
-  filterTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
+  listContentContainer: {
+    paddingBottom: 10,
   },
-  picker: {
-    height: 50,
-    width: '100%',
-  },
-  quantityInput: {
-    height: 40,
-    marginBottom: 10,
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#2980b9', // Cor do FAB
   },
   centeredView: {
     flex: 1,
@@ -393,29 +444,14 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 10,
   },
-  filterInfoContainer: {
+  buttonContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginLeft: 10,
+    justifyContent: 'space-between',
+    marginBottom: 20,
   },
-  filterItemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 10,
-    backgroundColor: '#e0e0e0',
-    padding: 5,
-    borderRadius: 5,
-  },
-  clearFilterButton: {
-    color: 'red',
-    marginLeft: 5,
-    fontWeight: 'bold',
-  },
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 0,
+  picker: {
+    height: 50,
+    width: '100%',
   },
 });
 
