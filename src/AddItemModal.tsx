@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Modal, Alert } from 'react-native';
 import { insertData, updateData } from './database/simple_db';
 import { Button } from 'react-native-paper';
+import styles from './styles'; // Importe os estilos do arquivo styles.ts
 
 interface AddItemModalProps {
   visible: boolean;
@@ -157,66 +158,5 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ visible, onClose, onAddItem
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalView: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    width: '80%',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingLeft: 10,
-    width: '100%',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginTop: 20,
-  },
-  quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 10,
-  },
-  quantityText: {
-    fontSize: 18,
-    marginHorizontal: 10,
-  },
-  quantityInput: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    width: 60,
-    textAlign: 'center',
-  },
-});
 
 export default AddItemModal; 
