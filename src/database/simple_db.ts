@@ -51,16 +51,26 @@ export async function clearInventoryTable() {
     }
 }
 
-export async function getAllInventory() {
-    if (!db) {
-      await openDatabase(); // Garante que o banco de dados esteja aberto
-    }
-    try {
-      const result = await db.getAllAsync('SELECT * FROM inventory');
-      console.log(result);
-    } catch (e) {
-      console.error('Erro ao obter todos os usuários:', e);
-    }
+export interface InventoryItem {
+  id: number;
+  nome: string;
+  marca: string;
+  categoria: string;
+  quantidade: number;
+}
+
+export async function getAllInventory(): Promise<InventoryItem[]> {
+  if (!db) {
+    await openDatabase(); // Garante que o banco de dados esteja aberto
+  }
+  try {
+    const result = await db.getAllAsync('SELECT * FROM inventory');
+    console.log(result);
+    return result as InventoryItem[]; // Retorna o resultado como um array de InventoryItem
+  } catch (e) {
+    console.error('Erro ao obter todos os itens do inventário:', e);
+    return []; // Em caso de erro, retorna um array vazio
+  }
 }
 
 export async function dropInventoryTable() {
@@ -169,6 +179,30 @@ export async function getInventoryByQuantidadeMaiorQue(quantidade: number) {
     } catch (e) {
         console.error('Erro ao obter o inventário pela quantidade maior que:', e);
     }
+}
+
+export async function updateData(id: number, nome: string, marca: string, categoria: string, quantidade: number) {
+  if (!db) {
+    await openDatabase(); // Garante que o banco de dados esteja aberto
+  }
+  try {
+    const result = await db.runAsync('UPDATE inventory SET nome = ?, marca = ?, categoria = ?, quantidade = ? WHERE id = ?', nome, marca, categoria, quantidade, id);
+    console.log(`Item com id ${id} atualizado com sucesso!`);
+  } catch (e) {
+    console.error(`Failed to update data for item with id ${id}`, e);
+  }
+}
+
+export async function deleteData(id: number) {
+  if (!db) {
+    await openDatabase(); // Garante que o banco de dados esteja aberto
+  }
+  try {
+    const result = await db.runAsync('DELETE FROM inventory WHERE id = ?', id);
+    console.log(`Item com id ${id} deletado com sucesso!`);
+  } catch (e) {
+    console.error(`Failed to delete data for item with id ${id}`, e);
+  }
 }
 
 
