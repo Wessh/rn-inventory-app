@@ -77,8 +77,33 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ visible, onClose, onAddItem
       } else {
         // Se selectedItem não existe, estamos adicionando um novo item
         const result = await insertData(trimmedNome, trimmedMarca, trimmedCategoria, quantidade);
-        onAddItem(); // Chama a função para recarregar os itens
-        onClose(); // Fecha o modal
+        
+        if (result && result.id) {
+          // Item duplicado encontrado
+          Alert.alert(
+            'Item Duplicado',
+            'Já existe um item com as mesmas características. Deseja somar a quantidade digitada com a quantidade existente?',
+            [
+              {
+                text: 'Cancelar',
+                style: 'cancel',
+              },
+              {
+                text: 'Somar',
+                onPress: async () => {
+                  const newQuantity = result.quantidade + quantidade;
+                  await updateData(result.id, trimmedNome, trimmedMarca, trimmedCategoria, newQuantity);
+                  onAddItem();
+                  onClose();
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else {
+          onAddItem(); // Chama a função para recarregar os itens
+          onClose(); // Fecha o modal
+        }
       }
     } catch (error) {
       console.error('Erro ao adicionar/atualizar item:', error);

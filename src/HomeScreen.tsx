@@ -4,6 +4,7 @@ import { getAllInventory, openDatabase, deleteData, getInventoryByFilters, getAv
 import AddItemModal from './AddItemModal';
 import { Picker } from '@react-native-picker/picker';
 import { Button, TextInput as PaperTextInput } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 interface InventoryItem {
   id: number;
@@ -118,7 +119,9 @@ const HomeScreen = () => {
         <Text>Categoria: {item.categoria}</Text>
         <Text>Quantidade: {item.quantidade}</Text>
       </View>
-      <Button mode="contained" onPress={() => handleDeleteItem(item.id)}>Deletar</Button>
+      <TouchableOpacity onPress={() => handleDeleteItem(item.id)}>
+        <MaterialCommunityIcons name="trash-can" size={24} color="red" />
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 
