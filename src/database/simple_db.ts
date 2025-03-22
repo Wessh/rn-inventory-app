@@ -242,15 +242,12 @@ export const getInventoryByFilters = async (
   }
   try {
     let sql = 'SELECT * FROM inventory WHERE 1=1';
-    const params: any[] = [];
 
     if (category) {
       sql += ' AND categoria = ?';
-      params.push(category);
     }
     if (marca) {
       sql += ' AND marca = ?';
-      params.push(marca);
     }
 
     let parsedQuantity: number | null = null;
@@ -261,17 +258,16 @@ export const getInventoryByFilters = async (
     if (parsedQuantity !== null && !isNaN(parsedQuantity)) {
       if (quantityFilter === 'gte') {
         sql += ' AND quantidade >= ?';
-        params.push(parsedQuantity);
       } else if (quantityFilter === 'lte') {
         sql += ' AND quantidade <= ?';
-        params.push(parsedQuantity);
       } else if (quantityFilter === 'eq') {
         sql += ' AND quantidade = ?';
-        params.push(parsedQuantity);
       }
     }
 
-    const result = await db.getAllAsync(sql, params);
+    sql += ' ORDER BY nome'; // Adiciona a ordenação por nome
+
+    const result = await db.getAllAsync(sql);
     return result as InventoryItem[];
   } catch (error) {
     console.error('Erro ao obter o inventário com filtros:', error);
