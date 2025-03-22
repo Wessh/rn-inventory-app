@@ -7,6 +7,7 @@ import { Button, TextInput as PaperTextInput, FAB } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import styles from './styles'; // Importe os estilos do arquivo styles.ts
+import { Button as PaperButton } from 'react-native-paper';
 
 interface InventoryItem {
   id: number;
@@ -28,6 +29,7 @@ const HomeScreen = () => {
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [availableMarcas, setAvailableMarcas] = useState<string[]>([]);
   const [filterDialogVisible, setFilterDialogVisible] = useState(false);
+  const [filterQuantity, setFilterQuantity] = useState(0);
 
   useEffect(() => {
     loadInventory();
@@ -141,6 +143,7 @@ const HomeScreen = () => {
     setSelectedMarca('');
     setSelectedQuantity('');
     setSelectedQuantityFilter('eq');
+    setFilterQuantity(0);
     loadInventory();
     hideFilterDialog();
   };
@@ -155,9 +158,26 @@ const HomeScreen = () => {
     loadInventory();
   };
 
+  const handleFilterIncrement = () => {
+    setFilterQuantity(filterQuantity + 1);
+  };
+
+  const handleFilterDecrement = () => {
+    if (filterQuantity > 0) {
+      setFilterQuantity(filterQuantity - 1);
+    }
+  };
+
+  const handleFilterQuantityChange = (text: string) => {
+    const numericValue = text.replace(/[^0-9]/g, '');
+    const parsedValue = parseInt(numericValue, 10);
+    setFilterQuantity(isNaN(parsedValue) ? 0 : parsedValue);
+  };
+
   const clearQuantityFilter = () => {
     setSelectedQuantity('');
     setSelectedQuantityFilter('eq');
+    setFilterQuantity(0);
     loadInventory();
   };
 
@@ -253,16 +273,16 @@ const HomeScreen = () => {
                   ))}
                 </Picker>
 
-                <PaperTextInput
-                  style={styles.filterTextInput}
-                  placeholder="Quantidade"
-                  value={selectedQuantity}
-                  onChangeText={(text) => {
-                    setSelectedQuantity(text);
-                  }}
-                  keyboardType="numeric"
-                  mode="outlined"
-                />
+                <View style={styles.quantityContainer}>
+                  <PaperButton mode="contained" buttonColor="#e0daf7" textColor="#000" onPress={handleFilterDecrement}>-</PaperButton>
+                  <TextInput
+                    style={styles.quantityInput}
+                    value={filterQuantity.toString()}
+                    onChangeText={handleFilterQuantityChange}
+                    keyboardType="number-pad"
+                  />
+                  <PaperButton mode="contained" buttonColor="#e0daf7" textColor="#000" onPress={handleFilterIncrement}>+</PaperButton>
+                </View>
                 <Picker
                   selectedValue={selectedQuantityFilter}
                   style={styles.picker}
@@ -277,6 +297,7 @@ const HomeScreen = () => {
                 <View style={styles.buttonContainer}>
                   <Button onPress={hideFilterDialog} buttonColor="#e0daf7" textColor="#000">Cancelar</Button>
                   <Button onPress={() => {
+                    setSelectedQuantity(filterQuantity.toString());
                     loadInventory();
                     hideFilterDialog();
                   }} buttonColor="#e0daf7" textColor="#000">Aplicar</Button>

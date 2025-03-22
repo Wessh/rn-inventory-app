@@ -143,7 +143,9 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    width: '100%',
+    marginTop: 20,
+    paddingHorizontal: 16,
   },
   picker: {
     height: 50,
