@@ -21,6 +21,7 @@ const HomeScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedMarca, setSelectedMarca] = useState('');
   const [selectedQuantity, setSelectedQuantity] = useState('');
+  const [selectedQuantityFilter, setSelectedQuantityFilter] = useState('');
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [availableMarcas, setAvailableMarcas] = useState<string[]>([]);
   const [filterDialogVisible, setFilterDialogVisible] = useState(false);
@@ -37,7 +38,7 @@ const HomeScreen = () => {
   const loadInventory = async () => {
     try {
       await openDatabase();
-      const data = await getInventoryByFilters(selectedCategory, selectedMarca, selectedQuantity);
+      const data = await getInventoryByFilters(selectedCategory, selectedMarca, selectedQuantity, selectedQuantityFilter);
       let filteredData = data;
       if (search) {
         filteredData = data.filter(item =>
@@ -211,6 +212,17 @@ const HomeScreen = () => {
                 keyboardType="numeric"
                 mode="outlined"
               />
+              <Picker
+                selectedValue={selectedQuantityFilter}
+                style={styles.picker}
+                onValueChange={(itemValue: string) => {
+                  setSelectedQuantityFilter(itemValue);
+                }}
+              >
+                <Picker.Item label="Igual a" value="eq" />
+                <Picker.Item label="Maior que" value="gt" />
+                <Picker.Item label="Menor que" value="lt" />
+              </Picker>
               <View style={styles.buttonContainer}>
                 <Button onPress={hideFilterDialog}>Cancelar</Button>
                 <Button onPress={() => {

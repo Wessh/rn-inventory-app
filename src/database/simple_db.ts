@@ -205,35 +205,45 @@ export async function deleteData(id: number) {
   }
 }
 
-export async function getInventoryByFilters(categoria: string, marca: string, quantidade: string): Promise<InventoryItem[]> {
+export const getInventoryByFilters = async (
+  category: string,
+  marca: string,
+  quantidade: string,
+  quantityFilter: string
+): Promise<InventoryItem[]> => {
   if (!db) {
     await openDatabase();
   }
   try {
-    let query = 'SELECT * FROM inventory WHERE 1=1';
+    let sql = 'SELECT * FROM inventory WHERE 1=1';
     const params: any[] = [];
 
-    if (categoria) {
-      query += ' AND categoria = ?';
-      params.push(categoria);
+    if (category) {
+      sql += ' AND categoria = ?';
+      params.push(category);
     }
     if (marca) {
-      query += ' AND marca = ?';
+      sql += ' AND marca = ?';
       params.push(marca);
     }
     if (quantidade) {
-      query += ' AND quantidade = ?';
+      if (quantityFilter === 'gt') {
+        sql += ' AND quantidade > ?';
+      } else if (quantityFilter === 'lt') {
+        sql += ' AND quantidade < ?';
+      } else {
+        sql += ' AND quantidade = ?';
+      }
       params.push(quantidade);
     }
 
-    const result = await db.getAllAsync(query, ...params);
-    console.log("Itens filtrados:", result);
+    const result = await db.getAllAsync(sql, ...params);
     return result as InventoryItem[];
-  } catch (e) {
-    console.error('Erro ao obter itens filtrados:', e);
+  } catch (error) {
+    console.error('Erro ao obter o inventário com filtros:', error);
     return [];
   }
-}
+};
 
 export async function getAvailableCategories(): Promise<string[]> {
   if (!db) {
