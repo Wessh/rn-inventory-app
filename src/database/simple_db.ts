@@ -23,12 +23,31 @@ export async function insertData(nome: string, marca: string, categoria: string,
     await openDatabase(); // Garante que o banco de dados esteja aberto
   }
   try {
-    const result = await db.runAsync('INSERT INTO inventory (nome, marca, categoria, quantidade) VALUES (?, ?, ?, ?)', nome, marca, categoria, quantidade);
+    // Verificar se já existe um item com as mesmas características
+    const existingItem = await db.getFirstAsync(
+      'SELECT * FROM inventory WHERE LOWER(nome) = LOWER(?) AND LOWER(marca) = LOWER(?) AND LOWER(categoria) = LOWER(?)',
+      nome,
+      marca,
+      categoria
+    );
+
+    if (existingItem) {
+      console.log('Item duplicado encontrado, não será inserido.');
+      return existingItem; // Retorna o item existente
+    }
+
+    const result = await db.runAsync(
+      'INSERT INTO inventory (nome, marca, categoria, quantidade) VALUES (?, ?, ?, ?)',
+      nome,
+      marca,
+      categoria,
+      quantidade
+    );
     console.log(result.lastInsertRowId, result.changes);
     const firstRow = await db.getFirstAsync('SELECT * FROM inventory');
     console.log(firstRow);
   } catch (e) {
-    console.error("Failed to insert data", e);
+    console.error('Failed to insert data', e);
   }
 }
 // Exporta a função para fechar o banco de dados

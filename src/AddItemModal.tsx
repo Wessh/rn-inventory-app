@@ -44,16 +44,40 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ visible, onClose, onAddItem
       return;
     }
 
+    const trimmedNome = nome.trim();
+    const trimmedMarca = marca.trim();
+    const trimmedCategoria = categoria.trim();
+    const trimmedQuantidade = quantidade.trim();
+
     try {
-      if (selectedItem) {
-        // Update existing item
-        await updateData(selectedItem.id, nome, marca, categoria, parseInt(quantidade, 10));
+      const result = await insertData(trimmedNome, trimmedMarca, trimmedCategoria, parseInt(trimmedQuantidade, 10));
+
+      if (result && result.id) {
+        // Item duplicado encontrado
+        Alert.alert(
+          'Item Duplicado',
+          'Já existe um item com as mesmas características. Deseja somar a quantidade digitada com a quantidade existente?',
+          [
+            {
+              text: 'Cancelar',
+              style: 'cancel',
+            },
+            {
+              text: 'Somar',
+              onPress: async () => {
+                const newQuantity = result.quantidade + parseInt(trimmedQuantidade, 10);
+                await updateData(result.id, trimmedNome, trimmedMarca, trimmedCategoria, newQuantity);
+                onAddItem();
+                onClose();
+              },
+            },
+          ],
+          { cancelable: false }
+        );
       } else {
-        // Add new item
-        await insertData(nome, marca, categoria, parseInt(quantidade, 10));
+        onAddItem(); // Chama a função para recarregar os itens
+        onClose(); // Fecha o modal
       }
-      onAddItem(); // Chama a função para recarregar os itens
-      onClose(); // Fecha o modal
     } catch (error) {
       console.error('Erro ao adicionar/atualizar item:', error);
     }
