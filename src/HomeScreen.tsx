@@ -3,7 +3,7 @@ import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, SafeArea
 import { getAllInventory, openDatabase, deleteData, getInventoryByFilters, getAvailableCategories, getAvailableMarcas } from './database/simple_db';
 import AddItemModal from './AddItemModal';
 import { Picker } from '@react-native-picker/picker';
-import { Button, TextInput as PaperTextInput } from 'react-native-paper';
+import { Button, TextInput as PaperTextInput, FAB } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -175,7 +175,6 @@ const HomeScreen = () => {
 
           <View style={styles.buttonContainer}>
             <Button mode="contained" onPress={showFilterDialog}>Filtros</Button>
-            <Button mode="contained" onPress={handleAddItem}>Adicionar Item</Button>
           </View>
 
           <View style={styles.filterInfoContainer}>
@@ -234,7 +233,7 @@ const HomeScreen = () => {
                   }}
                 >
                   <Picker.Item label="Todas as Categorias" value="" />
-                  {availableCategories.map((category) => (
+                  {availableCategories.map((category: string) => (
                     <Picker.Item key={category} label={category} value={category} />
                   ))}
                 </Picker>
@@ -247,7 +246,7 @@ const HomeScreen = () => {
                   }}
                 >
                   <Picker.Item label="Todas as Marcas" value="" />
-                  {availableMarcas.map((marca) => (
+                  {availableMarcas.map((marca: string) => (
                     <Picker.Item key={marca} label={marca} value={marca} />
                   ))}
                 </Picker>
@@ -287,6 +286,11 @@ const HomeScreen = () => {
             </View>
           </Modal>
         </View>
+        <FAB
+          style={styles.fab}
+          icon="plus"
+          onPress={handleAddItem}
+        />
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -404,6 +408,12 @@ const styles = StyleSheet.create({
     color: 'red',
     marginLeft: 5,
     fontWeight: 'bold',
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
   },
 });
 
