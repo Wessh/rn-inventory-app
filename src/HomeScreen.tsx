@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Modal } from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Modal, Platform, StatusBar } from 'react-native';
 import { getAllInventory, openDatabase, deleteData, getInventoryByFilters, getAvailableCategories, getAvailableMarcas } from './database/simple_db';
 import AddItemModal from './AddItemModal';
 import { Picker } from '@react-native-picker/picker';
 import { Button, TextInput as PaperTextInput } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 interface InventoryItem {
   id: number;
@@ -160,132 +161,134 @@ const HomeScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Inventário</Text>
-        <PaperTextInput
-          style={styles.searchInput}
-          placeholder="Pesquisar item..."
-          value={search}
-          onChangeText={setSearch}
-          mode="outlined"
-        />
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
+          <Text style={[styles.title, { textAlign: 'center' }]}>Inventário</Text>
+          <PaperTextInput
+            style={styles.searchInput}
+            placeholder="Pesquisar item..."
+            value={search}
+            onChangeText={setSearch}
+            mode="outlined"
+          />
 
-        <View style={styles.buttonContainer}>
-          <Button mode="contained" onPress={showFilterDialog}>Filtros</Button>
-          <Button mode="contained" onPress={handleAddItem}>Adicionar Item</Button>
-        </View>
-
-        <View style={styles.filterInfoContainer}>
-          {selectedCategory !== '' && (
-            <View style={styles.filterItemContainer}>
-              <Text>Categoria: {selectedCategory}</Text>
-              <TouchableOpacity onPress={() => clearCategoryFilter()}>
-                <Text style={styles.clearFilterButton}>X</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          {selectedMarca !== '' && (
-            <View style={styles.filterItemContainer}>
-              <Text>Marca: {selectedMarca}</Text>
-              <TouchableOpacity onPress={() => clearMarcaFilter()}>
-                <Text style={styles.clearFilterButton}>X</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          {selectedQuantity !== '' && (
-            <View style={styles.filterItemContainer}>
-              <Text>Quantidade: {selectedQuantity} ({selectedQuantityFilter})</Text>
-              <TouchableOpacity onPress={() => clearQuantityFilter()}>
-                <Text style={styles.clearFilterButton}>X</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-
-        <FlatList
-          data={inventory}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-        />
-        <AddItemModal
-          visible={modalVisible}
-          onClose={handleCloseModal}
-          onAddItem={handleItemAdded}
-          selectedItem={selectedItem} // Pass the selected item to the modal
-        />
-
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={filterDialogVisible}
-          onRequestClose={hideFilterDialog}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalTitle}>Filtros</Text>
-              <Picker
-                selectedValue={selectedCategory}
-                style={styles.picker}
-                onValueChange={(itemValue: string) => {
-                  setSelectedCategory(itemValue);
-                }}
-              >
-                <Picker.Item label="Todas as Categorias" value="" />
-                {availableCategories.map((category) => (
-                  <Picker.Item key={category} label={category} value={category} />
-                ))}
-              </Picker>
-
-              <Picker
-                selectedValue={selectedMarca}
-                style={styles.picker}
-                onValueChange={(itemValue: string) => {
-                  setSelectedMarca(itemValue);
-                }}
-              >
-                <Picker.Item label="Todas as Marcas" value="" />
-                {availableMarcas.map((marca) => (
-                  <Picker.Item key={marca} label={marca} value={marca} />
-                ))}
-              </Picker>
-
-              <PaperTextInput
-                style={styles.filterTextInput}
-                placeholder="Quantidade"
-                value={selectedQuantity}
-                onChangeText={(text) => {
-                  setSelectedQuantity(text);
-                }}
-                keyboardType="numeric"
-                mode="outlined"
-              />
-              <Picker
-                selectedValue={selectedQuantityFilter}
-                style={styles.picker}
-                onValueChange={(itemValue: string) => {
-                  setSelectedQuantityFilter(itemValue);
-                }}
-              >
-                <Picker.Item label="Igual a" value="eq" />
-                <Picker.Item label="Maior ou igual a" value="gte" />
-                <Picker.Item label="Menor ou igual a" value="lte" />
-              </Picker>
-              <View style={styles.buttonContainer}>
-                <Button onPress={hideFilterDialog}>Cancelar</Button>
-                <Button onPress={() => {
-                  loadInventory();
-                  hideFilterDialog();
-                }}>Aplicar</Button>
-              </View>
-              <View style={styles.buttonContainer}>
-                <Button onPress={clearFilters}>Limpar Filtros</Button>
-              </View>
-            </View>
+          <View style={styles.buttonContainer}>
+            <Button mode="contained" onPress={showFilterDialog}>Filtros</Button>
+            <Button mode="contained" onPress={handleAddItem}>Adicionar Item</Button>
           </View>
-        </Modal>
-      </View>
-    </SafeAreaView>
+
+          <View style={styles.filterInfoContainer}>
+            {selectedCategory !== '' && (
+              <View style={styles.filterItemContainer}>
+                <Text>Categoria: {selectedCategory}</Text>
+                <TouchableOpacity onPress={() => clearCategoryFilter()}>
+                  <Text style={styles.clearFilterButton}>X</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {selectedMarca !== '' && (
+              <View style={styles.filterItemContainer}>
+                <Text>Marca: {selectedMarca}</Text>
+                <TouchableOpacity onPress={() => clearMarcaFilter()}>
+                  <Text style={styles.clearFilterButton}>X</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {selectedQuantity !== '' && (
+              <View style={styles.filterItemContainer}>
+                <Text>Quantidade: {selectedQuantity} ({selectedQuantityFilter})</Text>
+                <TouchableOpacity onPress={() => clearQuantityFilter()}>
+                  <Text style={styles.clearFilterButton}>X</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+
+          <FlatList
+            data={inventory}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+          />
+          <AddItemModal
+            visible={modalVisible}
+            onClose={handleCloseModal}
+            onAddItem={handleItemAdded}
+            selectedItem={selectedItem} // Pass the selected item to the modal
+          />
+
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={filterDialogVisible}
+            onRequestClose={hideFilterDialog}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalTitle}>Filtros</Text>
+                <Picker
+                  selectedValue={selectedCategory}
+                  style={styles.picker}
+                  onValueChange={(itemValue: string) => {
+                    setSelectedCategory(itemValue);
+                  }}
+                >
+                  <Picker.Item label="Todas as Categorias" value="" />
+                  {availableCategories.map((category) => (
+                    <Picker.Item key={category} label={category} value={category} />
+                  ))}
+                </Picker>
+
+                <Picker
+                  selectedValue={selectedMarca}
+                  style={styles.picker}
+                  onValueChange={(itemValue: string) => {
+                    setSelectedMarca(itemValue);
+                  }}
+                >
+                  <Picker.Item label="Todas as Marcas" value="" />
+                  {availableMarcas.map((marca) => (
+                    <Picker.Item key={marca} label={marca} value={marca} />
+                  ))}
+                </Picker>
+
+                <PaperTextInput
+                  style={styles.filterTextInput}
+                  placeholder="Quantidade"
+                  value={selectedQuantity}
+                  onChangeText={(text) => {
+                    setSelectedQuantity(text);
+                  }}
+                  keyboardType="numeric"
+                  mode="outlined"
+                />
+                <Picker
+                  selectedValue={selectedQuantityFilter}
+                  style={styles.picker}
+                  onValueChange={(itemValue: string) => {
+                    setSelectedQuantityFilter(itemValue);
+                  }}
+                >
+                  <Picker.Item label="Igual a" value="eq" />
+                  <Picker.Item label="Maior ou igual a" value="gte" />
+                  <Picker.Item label="Menor ou igual a" value="lte" />
+                </Picker>
+                <View style={styles.buttonContainer}>
+                  <Button onPress={hideFilterDialog}>Cancelar</Button>
+                  <Button onPress={() => {
+                    loadInventory();
+                    hideFilterDialog();
+                  }}>Aplicar</Button>
+                </View>
+                <View style={styles.buttonContainer}>
+                  <Button onPress={clearFilters}>Limpar Filtros</Button>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 
