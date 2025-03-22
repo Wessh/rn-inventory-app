@@ -22,14 +22,15 @@ const HomeScreen = () => {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedMarca, setSelectedMarca] = useState('');
-  const [selectedQuantity, setSelectedQuantity] = useState('');
-  const [selectedQuantityFilter, setSelectedQuantityFilter] = useState('eq');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedMarca, setSelectedMarca] = useState<string>('');
+  const [selectedQuantity, setSelectedQuantity] = useState<string>('');
+  const [selectedQuantityFilter, setSelectedQuantityFilter] = useState<string>('');
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [availableMarcas, setAvailableMarcas] = useState<string[]>([]);
   const [filterDialogVisible, setFilterDialogVisible] = useState(false);
-  const [filterQuantity, setFilterQuantity] = useState(0);
+  const [filterQuantity, setFilterQuantity] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     loadInventory();
@@ -41,12 +42,18 @@ const HomeScreen = () => {
   }, [search, selectedCategory, selectedMarca, selectedQuantity, selectedQuantityFilter]);
 
   const loadInventory = async () => {
+    setIsLoading(true);
     try {
       await openDatabase();
-      const data = await getInventoryByFilters(selectedCategory, selectedMarca, selectedQuantity, selectedQuantityFilter);
-      let filteredData = data;
+      const inventory = await getInventoryByFilters(
+        selectedCategory,
+        selectedMarca,
+        selectedQuantityFilter !== '' ? filterQuantity.toString() : '',
+        selectedQuantityFilter
+      );
+      let filteredData = inventory;
       if (search) {
-        filteredData = data.filter(item =>
+        filteredData = inventory.filter(item =>
           item.nome.toLowerCase().includes(search.toLowerCase()) ||
           item.marca.toLowerCase().includes(search.toLowerCase()) ||
           item.categoria.toLowerCase().includes(search.toLowerCase())
@@ -55,6 +62,8 @@ const HomeScreen = () => {
       setInventory(filteredData);
     } catch (error) {
       console.error('Erro ao carregar o inventário:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -142,7 +151,7 @@ const HomeScreen = () => {
     setSelectedCategory('');
     setSelectedMarca('');
     setSelectedQuantity('');
-    setSelectedQuantityFilter('eq');
+    setSelectedQuantityFilter('');
     setFilterQuantity(0);
     loadInventory();
     hideFilterDialog();
@@ -176,7 +185,7 @@ const HomeScreen = () => {
 
   const clearQuantityFilter = () => {
     setSelectedQuantity('');
-    setSelectedQuantityFilter('eq');
+    setSelectedQuantityFilter('');
     setFilterQuantity(0);
     loadInventory();
   };
@@ -213,7 +222,7 @@ const HomeScreen = () => {
                   </TouchableOpacity>
                 </View>
               )}
-              {selectedQuantity !== '' && (
+              {selectedQuantity !== '' && selectedQuantityFilter !== '' && (
                 <View style={styles.filterItemContainer}>
                   <Text style={styles.filterText}>Quantidade: {selectedQuantity} ({selectedQuantityFilter})</Text>
                   <TouchableOpacity onPress={() => clearQuantityFilter()}>
@@ -290,6 +299,7 @@ const HomeScreen = () => {
                     setSelectedQuantityFilter(itemValue);
                   }}
                 >
+                  <Picker.Item label="Todas as Quantidades" value="" />
                   <Picker.Item label="Igual a" value="eq" />
                   <Picker.Item label="Maior ou igual a" value="gte" />
                   <Picker.Item label="Menor ou igual a" value="lte" />
