@@ -112,17 +112,22 @@ const HomeScreen = () => {
   };
 
   const renderItem = ({ item }: { item: InventoryItem }) => (
-    <TouchableOpacity style={styles.itemContainer} onPress={() => handleSelectItem(item)}>
-      <View>
+    <View style={styles.itemContainer}>
+      <TouchableOpacity style={styles.itemInfo} onPress={() => handleSelectItem(item)}>
         <Text>Nome: {item.nome}</Text>
         <Text>Marca: {item.marca}</Text>
         <Text>Categoria: {item.categoria}</Text>
         <Text>Quantidade: {item.quantidade}</Text>
-      </View>
-      <TouchableOpacity onPress={() => handleDeleteItem(item.id)}>
-        <MaterialCommunityIcons name="trash-can" size={24} color="red" />
       </TouchableOpacity>
-    </TouchableOpacity>
+      <View style={styles.itemButtons}>
+        <TouchableOpacity style={{ marginHorizontal: 8 }} onPress={() => handleSelectItem(item)}>
+          <MaterialCommunityIcons name="pencil" size={24} color="blue" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleDeleteItem(item.id)}>
+          <MaterialCommunityIcons name="trash-can" size={24} color="red" />
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 
   const showFilterDialog = () => setFilterDialogVisible(true);
@@ -312,7 +317,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: 100, // Ajuste a altura aqui
+    height: 100,
+  },
+  itemInfo: {
+    flex: 1,
+  },
+  itemButtons: {
+    flexDirection: 'row',
   },
   deleteIcon: {
     fontSize: 20,
