@@ -126,6 +126,31 @@ const HomeScreen = () => {
 
   const hideFilterDialog = () => setFilterDialogVisible(false);
 
+  const clearFilters = () => {
+    setSelectedCategory('');
+    setSelectedMarca('');
+    setSelectedQuantity('');
+    setSelectedQuantityFilter('eq');
+    loadInventory();
+    hideFilterDialog();
+  };
+
+  const clearCategoryFilter = () => {
+    setSelectedCategory('');
+    loadInventory();
+  };
+
+  const clearMarcaFilter = () => {
+    setSelectedMarca('');
+    loadInventory();
+  };
+
+  const clearQuantityFilter = () => {
+    setSelectedQuantity('');
+    setSelectedQuantityFilter('eq');
+    loadInventory();
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -143,17 +168,32 @@ const HomeScreen = () => {
           <Button mode="contained" onPress={handleAddItem}>Adicionar Item</Button>
         </View>
 
-        { <View style={styles.filterInfoContainer}>
+        <View style={styles.filterInfoContainer}>
           {selectedCategory !== '' && (
-            <Text>Categoria: {selectedCategory}</Text>
+            <View style={styles.filterItemContainer}>
+              <Text>Categoria: {selectedCategory}</Text>
+              <TouchableOpacity onPress={() => clearCategoryFilter()}>
+                <Text style={styles.clearFilterButton}>X</Text>
+              </TouchableOpacity>
+            </View>
           )}
           {selectedMarca !== '' && (
-            <Text>Marca: {selectedMarca}</Text>
+            <View style={styles.filterItemContainer}>
+              <Text>Marca: {selectedMarca}</Text>
+              <TouchableOpacity onPress={() => clearMarcaFilter()}>
+                <Text style={styles.clearFilterButton}>X</Text>
+              </TouchableOpacity>
+            </View>
           )}
           {selectedQuantity !== '' && (
-            <Text>Quantidade: {selectedQuantity}</Text>
+            <View style={styles.filterItemContainer}>
+              <Text>Quantidade: {selectedQuantity} ({selectedQuantityFilter})</Text>
+              <TouchableOpacity onPress={() => clearQuantityFilter()}>
+                <Text style={styles.clearFilterButton}>X</Text>
+              </TouchableOpacity>
+            </View>
           )}
-        </View> }
+        </View>
 
         <FlatList
           data={inventory}
@@ -229,6 +269,9 @@ const HomeScreen = () => {
                   loadInventory();
                   hideFilterDialog();
                 }}>Aplicar</Button>
+              </View>
+              <View style={styles.buttonContainer}>
+                <Button onPress={clearFilters}>Limpar Filtros</Button>
               </View>
             </View>
           </View>
@@ -328,7 +371,22 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   filterInfoContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     marginBottom: 20,
+  },
+  filterItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 10,
+    backgroundColor: '#e0e0e0',
+    padding: 5,
+    borderRadius: 5,
+  },
+  clearFilterButton: {
+    color: 'red',
+    marginLeft: 5,
+    fontWeight: 'bold',
   },
 });
 
