@@ -227,11 +227,11 @@ export const getInventoryByFilters = async (
       params.push(marca);
     }
     if (quantidade) {
-      if (quantityFilter === 'gt') {
-        sql += ' AND quantidade > ?';
-      } else if (quantityFilter === 'lt') {
-        sql += ' AND quantidade < ?';
-      } else {
+      if (quantityFilter === 'gte') {
+        sql += ' AND quantidade >= ?';
+      } else if (quantityFilter === 'lte') {
+        sql += ' AND quantidade <= ?';
+      } else if (quantityFilter === 'eq') {
         sql += ' AND quantidade = ?';
       }
       params.push(quantidade);

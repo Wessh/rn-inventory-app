@@ -21,7 +21,7 @@ const HomeScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedMarca, setSelectedMarca] = useState('');
   const [selectedQuantity, setSelectedQuantity] = useState('');
-  const [selectedQuantityFilter, setSelectedQuantityFilter] = useState('');
+  const [selectedQuantityFilter, setSelectedQuantityFilter] = useState('eq');
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [availableMarcas, setAvailableMarcas] = useState<string[]>([]);
   const [filterDialogVisible, setFilterDialogVisible] = useState(false);
@@ -33,7 +33,7 @@ const HomeScreen = () => {
 
   useEffect(() => {
     loadInventory();
-  }, [search, selectedCategory, selectedMarca, selectedQuantity]);
+  }, [search, selectedCategory, selectedMarca, selectedQuantity, selectedQuantityFilter]);
 
   const loadInventory = async () => {
     try {
@@ -220,8 +220,8 @@ const HomeScreen = () => {
                 }}
               >
                 <Picker.Item label="Igual a" value="eq" />
-                <Picker.Item label="Maior que" value="gt" />
-                <Picker.Item label="Menor que" value="lt" />
+                <Picker.Item label="Maior ou igual a" value="gte" />
+                <Picker.Item label="Menor ou igual a" value="lte" />
               </Picker>
               <View style={styles.buttonContainer}>
                 <Button onPress={hideFilterDialog}>Cancelar</Button>
