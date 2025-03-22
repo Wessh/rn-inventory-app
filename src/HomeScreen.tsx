@@ -80,6 +80,7 @@ const HomeScreen = () => {
 
   const handleItemAdded = () => {
     loadInventory(); // Recarrega os itens após adicionar um novo
+    loadFilters(); // Recarrega os filtros após adicionar um novo item
   };
 
   const handleSelectItem = (item: InventoryItem) => {
@@ -306,7 +307,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 8,
+    padding: 12,
   },
   title: {
     fontSize: 28,
