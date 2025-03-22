@@ -130,6 +130,18 @@ const HomeScreen = () => {
           <Button mode="contained" onPress={handleAddItem}>Adicionar Item</Button>
         </View>
 
+        { <View style={styles.filterInfoContainer}>
+          {selectedCategory !== '' && (
+            <Text>Categoria: {selectedCategory}</Text>
+          )}
+          {selectedMarca !== '' && (
+            <Text>Marca: {selectedMarca}</Text>
+          )}
+          {selectedQuantity !== '' && (
+            <Text>Quantidade: {selectedQuantity}</Text>
+          )}
+        </View> }
+
         <FlatList
           data={inventory}
           renderItem={renderItem}
@@ -290,6 +302,9 @@ const styles = StyleSheet.create({
     height: 40,
     width: '100%',
     marginBottom: 10,
+  },
+  filterInfoContainer: {
+    marginBottom: 20,
   },
 });
 

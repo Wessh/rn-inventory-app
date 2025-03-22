@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Modal } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Modal, Alert } from 'react-native';
 import { insertData, updateData } from './database/simple_db';
 import { Button } from 'react-native-paper';
 
@@ -39,6 +39,11 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ visible, onClose, onAddItem
   }, [visible, selectedItem]);
 
   const handleSaveItem = async () => {
+    if (!nome || !marca || !categoria || !quantidade) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      return;
+    }
+
     try {
       if (selectedItem) {
         // Update existing item
