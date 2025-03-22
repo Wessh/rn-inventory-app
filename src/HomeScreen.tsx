@@ -80,7 +80,6 @@ const HomeScreen = () => {
 
   const handleItemAdded = () => {
     loadInventory(); // Recarrega os itens após adicionar um novo
-    loadFilters(); // Recarrega os filtros após adicionar um novo item
   };
 
   const handleSelectItem = (item: InventoryItem) => {
@@ -175,7 +174,7 @@ const HomeScreen = () => {
           />
 
           <View style={styles.filterContainer}>
-            <Button mode="contained" onPress={showFilterDialog}>Filtros</Button>
+            <Button mode="contained" onPress={showFilterDialog} buttonColor="#e0daf7" textColor="#000">Filtros</Button>
             <View style={styles.filterInfoContainer}>
               {selectedCategory !== '' && (
                 <View style={styles.filterItemContainer}>
@@ -204,14 +203,12 @@ const HomeScreen = () => {
             </View>
           </View>
 
-          <View style={styles.listContainer}>
-            <FlatList
-              data={inventory}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id.toString()}
-              contentContainerStyle={styles.listContentContainer}
-            />
-          </View>
+          <FlatList
+            data={inventory}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={styles.listContentContainer}
+          />
 
           <AddItemModal
             visible={modalVisible}
@@ -277,23 +274,24 @@ const HomeScreen = () => {
                   <Picker.Item label="Menor ou igual a" value="lte" />
                 </Picker>
                 <View style={styles.buttonContainer}>
-                  <Button onPress={hideFilterDialog}>Cancelar</Button>
+                  <Button onPress={hideFilterDialog} buttonColor="#e0daf7" textColor="#000">Cancelar</Button>
                   <Button onPress={() => {
                     loadInventory();
                     hideFilterDialog();
-                  }}>Aplicar</Button>
+                  }} buttonColor="#e0daf7" textColor="#000">Aplicar</Button>
                 </View>
-                <View style={styles.buttonContainer}>
-                  <Button onPress={clearFilters}>Limpar Filtros</Button>
+                <View style={styles.clearButtonContainer}>
+                  <Button onPress={clearFilters} buttonColor="#e0daf7" textColor="#000">Limpar</Button>
                 </View>
               </View>
             </View>
           </Modal>
         </View>
         <FAB
-          style={styles.fab}
+          style={[styles.fab, { backgroundColor: '#e0daf7' }]}
           icon="plus"
           onPress={handleAddItem}
+          color="#000"
         />
       </SafeAreaView>
     </SafeAreaProvider>
@@ -307,7 +305,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 12,
+    padding: 20,
   },
   title: {
     fontSize: 28,
@@ -352,7 +350,6 @@ const styles = StyleSheet.create({
     padding: 12, // Diminui o padding
     borderRadius: 8, // Diminui o borderRadius
     marginBottom: 8, // Diminui o marginBottom
-    marginHorizontal: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 }, // Diminui a sombra
     shadowOpacity: 0.1,
@@ -390,11 +387,8 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     backgroundColor: '#ecf0f1', // Cor de fundo da lista
-    flex: 1, // Garante que a lista ocupe o espaço restante
     paddingTop: 10,
     borderRadius: 10,
-    marginHorizontal: 0, // Adiciona margem horizontal
-    marginBottom: 10, // Adiciona margem inferior
   },
   listContentContainer: {
     paddingBottom: 10,
@@ -404,7 +398,6 @@ const styles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 0,
-    backgroundColor: '#2980b9', // Cor do FAB
   },
   centeredView: {
     flex: 1,
@@ -454,6 +447,11 @@ const styles = StyleSheet.create({
     height: 50,
     width: '100%',
   },
+  clearButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
 });
 
-export default HomeScreen; 
+export default HomeScreen;

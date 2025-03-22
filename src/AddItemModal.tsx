@@ -139,18 +139,18 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ visible, onClose, onAddItem
             onChangeText={setCategoria}
           />
           <View style={styles.quantityContainer}>
-            <Button mode="contained" onPress={handleDecrement}>-</Button>
+            <Button mode="contained" buttonColor="#e0daf7" textColor="#000" onPress={handleDecrement}>-</Button>
             <TextInput
               style={styles.quantityInput}
               value={quantidade.toString()}
               onChangeText={handleQuantidadeChange}
               keyboardType="number-pad"
             />
-            <Button mode="contained" onPress={handleIncrement}>+</Button>
+            <Button mode="contained" buttonColor="#e0daf7" textColor="#000" onPress={handleIncrement}>+</Button>
           </View>
           <View style={styles.buttonContainer}>
-            <Button mode="contained" onPress={handleSaveItem}>Salvar</Button>
-            <Button mode="contained" onPress={onClose}>Cancelar</Button>
+            <Button mode="contained" buttonColor="#e0daf7" textColor="#000" onPress={handleSaveItem}>Salvar</Button>
+            <Button mode="contained" buttonColor="#e0daf7" textColor="#000" onPress={onClose}>Cancelar</Button>
           </View>
         </View>
       </View>
