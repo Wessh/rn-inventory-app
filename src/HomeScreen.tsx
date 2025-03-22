@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Modal } from 'react-native';
 import { getAllInventory, openDatabase, deleteData, getInventoryByFilters, getAvailableCategories, getAvailableMarcas } from './database/simple_db';
 import AddItemModal from './AddItemModal';
 import { Picker } from '@react-native-picker/picker';
-import { Button, Dialog, Portal, Provider, TextInput as PaperTextInput } from 'react-native-paper';
+import { Button, TextInput as PaperTextInput } from 'react-native-paper';
 
 interface InventoryItem {
   id: number;
@@ -114,88 +114,91 @@ const HomeScreen = () => {
   const hideFilterDialog = () => setFilterDialogVisible(false);
 
   return (
-    <Provider>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.container}>
-          <Text style={styles.title}>Inventário</Text>
-          <PaperTextInput
-            style={styles.searchInput}
-            placeholder="Pesquisar item..."
-            value={search}
-            onChangeText={setSearch}
-            mode="outlined"
-          />
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Inventário</Text>
+        <PaperTextInput
+          style={styles.searchInput}
+          placeholder="Pesquisar item..."
+          value={search}
+          onChangeText={setSearch}
+          mode="outlined"
+        />
 
-          <View style={styles.buttonContainer}>
-            <Button mode="contained" onPress={showFilterDialog}>Filtros</Button>
-            <Button mode="contained" onPress={handleAddItem}>Adicionar Item</Button>
-          </View>
+        <View style={styles.buttonContainer}>
+          <Button mode="contained" onPress={showFilterDialog}>Filtros</Button>
+          <Button mode="contained" onPress={handleAddItem}>Adicionar Item</Button>
+        </View>
 
-          <FlatList
-            data={inventory}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-          />
-          <AddItemModal
-            visible={modalVisible}
-            onClose={handleCloseModal}
-            onAddItem={handleItemAdded}
-            selectedItem={selectedItem} // Pass the selected item to the modal
-          />
+        <FlatList
+          data={inventory}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+        />
+        <AddItemModal
+          visible={modalVisible}
+          onClose={handleCloseModal}
+          onAddItem={handleItemAdded}
+          selectedItem={selectedItem} // Pass the selected item to the modal
+        />
 
-          <Portal>
-            <Dialog visible={filterDialogVisible} onDismiss={hideFilterDialog}>
-              <Dialog.Title>Filtros</Dialog.Title>
-              <Dialog.Content>
-                <Picker
-                  selectedValue={selectedCategory}
-                  style={styles.picker}
-                  onValueChange={(itemValue: string) => {
-                    setSelectedCategory(itemValue);
-                  }}
-                >
-                  <Picker.Item label="Todas as Categorias" value="" />
-                  {availableCategories.map((category) => (
-                    <Picker.Item key={category} label={category} value={category} />
-                  ))}
-                </Picker>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={filterDialogVisible}
+          onRequestClose={hideFilterDialog}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalTitle}>Filtros</Text>
+              <Picker
+                selectedValue={selectedCategory}
+                style={styles.picker}
+                onValueChange={(itemValue: string) => {
+                  setSelectedCategory(itemValue);
+                }}
+              >
+                <Picker.Item label="Todas as Categorias" value="" />
+                {availableCategories.map((category) => (
+                  <Picker.Item key={category} label={category} value={category} />
+                ))}
+              </Picker>
 
-                <Picker
-                  selectedValue={selectedMarca}
-                  style={styles.picker}
-                  onValueChange={(itemValue: string) => {
-                    setSelectedMarca(itemValue);
-                  }}
-                >
-                  <Picker.Item label="Todas as Marcas" value="" />
-                  {availableMarcas.map((marca) => (
-                    <Picker.Item key={marca} label={marca} value={marca} />
-                  ))}
-                </Picker>
+              <Picker
+                selectedValue={selectedMarca}
+                style={styles.picker}
+                onValueChange={(itemValue: string) => {
+                  setSelectedMarca(itemValue);
+                }}
+              >
+                <Picker.Item label="Todas as Marcas" value="" />
+                {availableMarcas.map((marca) => (
+                  <Picker.Item key={marca} label={marca} value={marca} />
+                ))}
+              </Picker>
 
-                <PaperTextInput
-                  style={styles.quantityInput}
-                  placeholder="Quantidade"
-                  value={selectedQuantity}
-                  onChangeText={(text) => {
-                    setSelectedQuantity(text);
-                  }}
-                  keyboardType="numeric"
-                  mode="outlined"
-                />
-              </Dialog.Content>
-              <Dialog.Actions>
+              <PaperTextInput
+                style={styles.filterTextInput}
+                placeholder="Quantidade"
+                value={selectedQuantity}
+                onChangeText={(text) => {
+                  setSelectedQuantity(text);
+                }}
+                keyboardType="numeric"
+                mode="outlined"
+              />
+              <View style={styles.buttonContainer}>
                 <Button onPress={hideFilterDialog}>Cancelar</Button>
                 <Button onPress={() => {
                   loadInventory();
                   hideFilterDialog();
                 }}>Aplicar</Button>
-              </Dialog.Actions>
-            </Dialog>
-          </Portal>
-        </View>
-      </SafeAreaView>
-    </Provider>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -236,12 +239,56 @@ const styles = StyleSheet.create({
   filterContainer: {
     marginBottom: 20,
   },
+  filterTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
   picker: {
     height: 50,
     width: '100%',
   },
   quantityInput: {
     height: 40,
+    marginBottom: 10,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '80%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingLeft: 10,
+    width: '100%',
+  },
+  filterTextInput: {
+    height: 40,
+    width: '100%',
     marginBottom: 10,
   },
 });

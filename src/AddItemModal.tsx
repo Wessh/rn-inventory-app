@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Modal } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Modal } from 'react-native';
 import { insertData, updateData } from './database/simple_db';
+import { Button } from 'react-native-paper';
 
 interface AddItemModalProps {
   visible: boolean;
@@ -89,8 +90,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ visible, onClose, onAddItem
             keyboardType="numeric"
           />
           <View style={styles.buttonContainer}>
-            <Button title="Salvar" onPress={handleSaveItem} />
-            <Button title="Cancelar" onPress={onClose} />
+            <Button mode="contained" onPress={handleSaveItem}>Salvar</Button>
+            <Button mode="contained" onPress={onClose}>Cancelar</Button>
           </View>
         </View>
       </View>
