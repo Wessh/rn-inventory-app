@@ -205,5 +205,65 @@ export async function deleteData(id: number) {
   }
 }
 
+export async function getInventoryByFilters(categoria: string, marca: string, quantidade: string): Promise<InventoryItem[]> {
+  if (!db) {
+    await openDatabase();
+  }
+  try {
+    let query = 'SELECT * FROM inventory WHERE 1=1';
+    const params: any[] = [];
+
+    if (categoria) {
+      query += ' AND categoria = ?';
+      params.push(categoria);
+    }
+    if (marca) {
+      query += ' AND marca = ?';
+      params.push(marca);
+    }
+    if (quantidade) {
+      query += ' AND quantidade = ?';
+      params.push(quantidade);
+    }
+
+    const result = await db.getAllAsync(query, ...params);
+    console.log("Itens filtrados:", result);
+    return result as InventoryItem[];
+  } catch (e) {
+    console.error('Erro ao obter itens filtrados:', e);
+    return [];
+  }
+}
+
+export async function getAvailableCategories(): Promise<string[]> {
+  if (!db) {
+    await openDatabase();
+  }
+  try {
+    const result = await db.getAllAsync('SELECT DISTINCT categoria FROM inventory');
+    const categories = result.map((item: any) => item.categoria) as string[];
+    console.log("Categorias disponíveis:", categories);
+    return categories;
+  } catch (e) {
+    console.error('Erro ao obter categorias disponíveis:', e);
+    return [];
+  }
+}
+
+export async function getAvailableMarcas(): Promise<string[]> {
+  if (!db) {
+    await openDatabase();
+  }
+  try {
+    const result = await db.getAllAsync('SELECT DISTINCT marca FROM inventory');
+    const marcas = result.map((item: any) => item.marca) as string[];
+    console.log("Marcas disponíveis:", marcas);
+    return marcas;
+  } catch (e) {
+    console.error('Erro ao obter marcas disponíveis:', e);
+    return [];
+  }
+}
+
 
 
