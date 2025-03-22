@@ -20,7 +20,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ visible, onClose, onAddItem
   const [nome, setNome] = useState('');
   const [marca, setMarca] = useState('');
   const [categoria, setCategoria] = useState('');
-  const [quantidade, setQuantidade] = useState('');
+  const [quantidade, setQuantidade] = useState(0);
 
   useEffect(() => {
     if (visible) {
@@ -28,18 +28,38 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ visible, onClose, onAddItem
         setNome(selectedItem.nome);
         setMarca(selectedItem.marca);
         setCategoria(selectedItem.categoria);
-        setQuantidade(selectedItem.quantidade.toString());
+        setQuantidade(selectedItem.quantidade);
       } else {
         setNome('');
         setMarca('');
         setCategoria('');
-        setQuantidade('');
+        setQuantidade(0);
       }
     }
   }, [visible, selectedItem]);
 
+  const handleIncrement = () => {
+    setQuantidade(quantidade + 1);
+  };
+
+  const handleDecrement = () => {
+    if (quantidade > 0) {
+      setQuantidade(quantidade - 1);
+    }
+  };
+
+  const handleQuantidadeChange = (text: string) => {
+    // Remove caracteres não numéricos
+    const numericValue = text.replace(/[^0-9]/g, '');
+    // Converte para número
+    const parsedValue = parseInt(numericValue, 10);
+  
+    // Define o estado, garantindo que seja um número ou 0 se não for válido
+    setQuantidade(isNaN(parsedValue) ? 0 : parsedValue);
+  };
+
   const handleSaveItem = async () => {
-    if (!nome || !marca || !categoria || !quantidade) {
+    if (!nome || !marca || !categoria) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos.');
       return;
     }
@@ -47,34 +67,16 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ visible, onClose, onAddItem
     const trimmedNome = nome.trim();
     const trimmedMarca = marca.trim();
     const trimmedCategoria = categoria.trim();
-    const trimmedQuantidade = quantidade.trim();
 
     try {
-      const result = await insertData(trimmedNome, trimmedMarca, trimmedCategoria, parseInt(trimmedQuantidade, 10));
-
-      if (result && result.id) {
-        // Item duplicado encontrado
-        Alert.alert(
-          'Item Duplicado',
-          'Já existe um item com as mesmas características. Deseja somar a quantidade digitada com a quantidade existente?',
-          [
-            {
-              text: 'Cancelar',
-              style: 'cancel',
-            },
-            {
-              text: 'Somar',
-              onPress: async () => {
-                const newQuantity = result.quantidade + parseInt(trimmedQuantidade, 10);
-                await updateData(result.id, trimmedNome, trimmedMarca, trimmedCategoria, newQuantity);
-                onAddItem();
-                onClose();
-              },
-            },
-          ],
-          { cancelable: false }
-        );
+      if (selectedItem) {
+        // Se selectedItem existe, estamos editando um item existente
+        await updateData(selectedItem.id, trimmedNome, trimmedMarca, trimmedCategoria, quantidade);
+        onAddItem(); // Chama a função para recarregar os itens
+        onClose(); // Fecha o modal
       } else {
+        // Se selectedItem não existe, estamos adicionando um novo item
+        const result = await insertData(trimmedNome, trimmedMarca, trimmedCategoria, quantidade);
         onAddItem(); // Chama a função para recarregar os itens
         onClose(); // Fecha o modal
       }
@@ -111,13 +113,16 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ visible, onClose, onAddItem
             value={categoria}
             onChangeText={setCategoria}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Quantidade"
-            value={quantidade}
-            onChangeText={setQuantidade}
-            keyboardType="numeric"
-          />
+          <View style={styles.quantityContainer}>
+            <Button mode="contained" onPress={handleDecrement}>-</Button>
+            <TextInput
+              style={styles.quantityInput}
+              value={quantidade.toString()}
+              onChangeText={handleQuantidadeChange}
+              keyboardType="number-pad"
+            />
+            <Button mode="contained" onPress={handleIncrement}>+</Button>
+          </View>
           <View style={styles.buttonContainer}>
             <Button mode="contained" onPress={handleSaveItem}>Salvar</Button>
             <Button mode="contained" onPress={onClose}>Cancelar</Button>
@@ -168,6 +173,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: '100%',
     marginTop: 20,
+  },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 10,
+  },
+  quantityText: {
+    fontSize: 18,
+    marginHorizontal: 10,
+  },
+  quantityInput: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    width: 60,
+    textAlign: 'center',
   },
 });
 

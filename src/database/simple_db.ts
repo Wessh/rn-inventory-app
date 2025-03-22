@@ -200,15 +200,22 @@ export async function getInventoryByQuantidadeMaiorQue(quantidade: number) {
     }
 }
 
-export async function updateData(id: number, nome: string, marca: string, categoria: string, quantidade: number) {
+export async function updateData(id: number, nome: string, marca: string, categoria: string, quantidade: number): Promise<void> {
   if (!db) {
     await openDatabase(); // Garante que o banco de dados esteja aberto
   }
   try {
-    const result = await db.runAsync('UPDATE inventory SET nome = ?, marca = ?, categoria = ?, quantidade = ? WHERE id = ?', nome, marca, categoria, quantidade, id);
-    console.log(`Item com id ${id} atualizado com sucesso!`);
+    await db.runAsync(
+      'UPDATE inventory SET nome = ?, marca = ?, categoria = ?, quantidade = ? WHERE id = ?',
+      nome,
+      marca,
+      categoria,
+      quantidade,
+      id
+    );
+    console.log(`Item com ID ${id} atualizado com sucesso.`);
   } catch (e) {
-    console.error(`Failed to update data for item with id ${id}`, e);
+    console.error(`Failed to update data for item with ID ${id}`, e);
   }
 }
 
