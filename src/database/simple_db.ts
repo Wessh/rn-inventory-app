@@ -252,18 +252,26 @@ export const getInventoryByFilters = async (
       sql += ' AND marca = ?';
       params.push(marca);
     }
+
+    let parsedQuantity: number | null = null;
     if (quantidade) {
-      if (quantityFilter === 'gte') {
-        sql += ' AND quantidade >= ?';
-      } else if (quantityFilter === 'lte') {
-        sql += ' AND quantidade <= ?';
-      } else if (quantityFilter === 'eq') {
-        sql += ' AND quantidade = ?';
-      }
-      params.push(quantidade);
+      parsedQuantity = parseInt(quantidade, 10);
     }
 
-    const result = await db.getAllAsync(sql, ...params);
+    if (parsedQuantity !== null && !isNaN(parsedQuantity)) {
+      if (quantityFilter === 'gte') {
+        sql += ' AND quantidade >= ?';
+        params.push(parsedQuantity);
+      } else if (quantityFilter === 'lte') {
+        sql += ' AND quantidade <= ?';
+        params.push(parsedQuantity);
+      } else if (quantityFilter === 'eq') {
+        sql += ' AND quantidade = ?';
+        params.push(parsedQuantity);
+      }
+    }
+
+    const result = await db.getAllAsync(sql, params);
     return result as InventoryItem[];
   } catch (error) {
     console.error('Erro ao obter o inventário com filtros:', error);
