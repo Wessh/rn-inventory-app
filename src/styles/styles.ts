@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#fff',
     width: '100%',
+    height: '100%',
     padding: 8,
   },
   fab: {

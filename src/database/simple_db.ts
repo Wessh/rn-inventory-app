@@ -6,6 +6,9 @@ async function openDatabase() {
   db = await SQLite.openDatabaseAsync('inventory-app');
 
   await db.execAsync(`
+    --DROP TABLE IF EXISTS app_settings;
+    --DROP TABLE IF EXISTS inventory;
+
     PRAGMA journal_mode = WAL; 
     CREATE TABLE IF NOT EXISTS inventory (
     id INTEGER PRIMARY KEY NOT NULL, 
@@ -17,11 +20,12 @@ async function openDatabase() {
 
     CREATE TABLE IF NOT EXISTS app_settings (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      app_name TEXT NOT NULL
+      app_name TEXT NOT NULL,
+      black_theme BOOLEAN DEFAULT false
     );
 
-    INSERT INTO app_settings (app_name) 
-    SELECT 'Inventário' 
+    INSERT INTO app_settings (app_name, black_theme) 
+    SELECT 'Inventário', false
     WHERE NOT EXISTS (
       SELECT 1 FROM app_settings WHERE id = 1
     );
