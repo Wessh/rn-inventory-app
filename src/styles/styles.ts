@@ -105,9 +105,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalView: {
+    margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    width: '80%',
+    width: '80%', // Define a largura do modal
   },
   modalTitle: {
     fontSize: 20,
@@ -128,12 +128,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   input: {
-    height: 40,
+    height: 50,
     borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 10,
     paddingLeft: 10,
     width: '100%',
+    fontSize: 16,
   },
   filterTextInput: {
     height: 40,
@@ -173,6 +174,37 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: 60,
     textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo semi-transparente
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%', // Ajuste a largura conforme necessário
+    maxHeight: '80%', // Ajuste a altura conforme necessário
+    alignItems: 'center',
+    elevation: 5, // Adiciona uma sombra
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  settingsButton: {
+    padding: 10,
+  },
+  filterButton: {
+    width: 100, // Ajuste a largura conforme necessário
   },
 });
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Modal, Alert } from 'react-native';
-import { insertData, updateData } from './database/simple_db';
+import { insertData, updateData } from '../database/simple_db';
 import { Button } from 'react-native-paper';
-import styles from './styles'; // Importe os estilos do arquivo styles.ts
+import styles from '../styles/styles'; // Importe os estilos do arquivo styles.ts
 
 interface AddItemModalProps {
   visible: boolean;
