@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Platform, StatusBar, Modal } from 'react-native';
 import { getAllInventory, openDatabase, deleteData, getInventoryByFilters, getAvailableCategories, getAvailableMarcas, getAppName } from '../database/simple_db';
 import AddItemModal from '../modals/AddItemModal';
@@ -9,7 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import styles from '../styles/styles'; // Importe os estilos do arquivo styles.ts
 import { Button as PaperButton } from 'react-native-paper';
 import SettingsScreen from './SettingsScreen';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { AppContext } from '../AppContext';
 
 interface InventoryItem {
@@ -45,6 +45,12 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     loadInventory();
   }, [search, selectedCategory, selectedMarca, selectedQuantity, selectedQuantityFilter]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadFilters();
+    }, [])
+  );
 
   const loadInventory = async () => {
     setIsLoading(true);
@@ -97,6 +103,7 @@ const HomeScreen: React.FC = () => {
 
   const handleItemAdded = () => {
     loadInventory(); // Recarrega os itens após adicionar um novo
+    loadFilters(); // Recarrega os filtros após adicionar um novo item
   };
 
   const handleSelectItem = (item: InventoryItem) => {
