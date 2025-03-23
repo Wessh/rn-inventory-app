@@ -216,6 +216,16 @@ const styles = StyleSheet.create({
   filterButton: {
     width: 100, // Ajuste a largura conforme necessário
   },
+  emptyListContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  emptyListText: {
+    fontSize: 16,
+    color: '#000',//'#8e44ad',
+  },
 });
 
 export default styles; 

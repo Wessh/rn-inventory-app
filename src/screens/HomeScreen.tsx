@@ -241,6 +241,11 @@ const HomeScreen: React.FC = () => {
             renderItem={renderItem}
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.listContentContainer}
+            ListEmptyComponent={() => (
+              <View style={styles.emptyListContainer}>
+                <Text style={styles.emptyListText}>Não possui registro de itens!</Text>
+              </View>
+            )}
           />
 
           <AddItemModal
