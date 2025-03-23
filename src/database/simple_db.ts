@@ -6,8 +6,8 @@ async function openDatabase() {
   db = await SQLite.openDatabaseAsync('inventory-app');
 
   await db.execAsync(`
-    DROP TABLE IF EXISTS app_settings;
-    DROP TABLE IF EXISTS inventory;
+    --DROP TABLE IF EXISTS app_settings;
+    --DROP TABLE IF EXISTS inventory;
 
     PRAGMA journal_mode = WAL; 
     CREATE TABLE IF NOT EXISTS inventory (
