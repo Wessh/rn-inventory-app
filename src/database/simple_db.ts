@@ -13,10 +13,38 @@ async function openDatabase() {
     marca TEXT, 
     categoria TEXT,
     quantidade INTEGER
-    );`);
+    );
+
+    CREATE TABLE IF NOT EXISTS app_settings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      app_name TEXT NOT NULL
+    );
+
+    INSERT INTO app_settings (app_name) 
+    SELECT 'Inventário' 
+    WHERE NOT EXISTS (
+      SELECT 1 FROM app_settings WHERE id = 1
+    );
+    `);
+
 }
 // Exporta a função openDatabase para ser chamada externamente
 export { openDatabase };
+
+export async function getAppName() {
+  if (!db) {
+    await openDatabase();
+  }
+  const result: any = await db.getFirstAsync('SELECT app_name FROM app_settings');
+  return result.app_name;
+}
+
+export async function updateAppName(app_name: string) {
+  if (!db) {
+    await openDatabase();
+  }
+  await db.runAsync('UPDATE app_settings SET app_name = ? WHERE id = 1', app_name);
+}
 // Exporta a função insertData para ser chamada externamente
 export async function insertData(nome: string, marca: string, categoria: string, quantidade: number) {
   if (!db) {
@@ -308,6 +336,17 @@ export async function getAvailableMarcas(): Promise<string[]> {
     return [];
   }
 }
+
+export const saveAppName = async (appName: string): Promise<void> => {
+  try {
+    if (!db) {
+      await openDatabase();
+    }
+    await db.runAsync('UPDATE app_settings SET app_name = ? WHERE id = 1', [appName]);
+  } catch (error) {
+    console.error('Erro ao salvar o nome do app:', error);
+  }
+};
 
 
 

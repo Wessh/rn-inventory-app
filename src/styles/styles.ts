@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
+    padding:8,
   },
   title: {
     fontSize: 28,
@@ -17,8 +17,12 @@ const styles = StyleSheet.create({
     color: '#34495e', // Cor do título
   },
   searchInput: {
+    marginTop: -8,
     marginBottom: 15,
     backgroundColor: '#fff',
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
   },
   filterContainer: {
     flexDirection: 'row',
@@ -60,7 +64,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // Alinha os itens horizontalmente
     justifyContent: 'space-between', // Espaço entre os itens
     alignItems: 'center', // Centraliza verticalmente
-    paddingHorizontal: 20, // Adiciona padding horizontal
+    paddingHorizontal: 8, // Adiciona padding horizontal
+    paddingVertical: 8, // Adiciona padding vertical
   },
   itemInfo: {
     flex: 1,
@@ -94,6 +99,10 @@ const styles = StyleSheet.create({
   },
   listContentContainer: {
     paddingBottom: 10,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    width: '100%',
+    padding: 8,
   },
   fab: {
     position: 'absolute',

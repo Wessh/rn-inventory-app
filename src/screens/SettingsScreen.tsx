@@ -1,18 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TextInput, StyleSheet, Platform, StatusBar, Alert } from 'react-native';
 import { Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from '../styles/styles'; // Importe os estilos do arquivo styles.ts
+import { getAppName, openDatabase, updateAppName } from '../database/simple_db';
+import { AppContext } from '../AppContext';
+import { useNavigation } from '@react-navigation/native';
+import * as Updates from 'expo-updates';
 
-const SettingsScreen = () => {
-  const [appName, setAppName] = useState('Inventário'); // Nome padrão do app
-  const [newAppName, setNewAppName] = useState(appName);
+const SettingsScreen: React.FC = () => {
+  const { setAppName } = useContext(AppContext);
+  const [newAppName, setNewAppName] = useState('');
+  const navigation = useNavigation();
 
-  const handleSaveAppName = () => {
-    // Aqui você pode adicionar a lógica para salvar o novo nome do app
-    // Por exemplo, você pode salvar o nome em AsyncStorage ou em um arquivo de configuração
+  useEffect(() => {
+    const loadAppName = async () => {
+      await openDatabase();
+      const storedAppName = await getAppName();
+      console.log(`App Name SettingsScreen: ${storedAppName}`);
+      setNewAppName(storedAppName);
+      setAppName(storedAppName);
+    };
+
+    loadAppName();
+  }, []);
+
+  const handleSaveAppName = async () => {
+    await openDatabase();
+    await updateAppName(newAppName);
     setAppName(newAppName);
-    Alert.alert('Nome do app alterado para: ' + newAppName);
+    Alert.alert('Nome do App', 'O nome do app foi salvo com sucesso! Ao clicar em OK, o app será recarregado!',
+      [
+        { text: 'OK', onPress: () => {
+        Updates.reloadAsync();
+      }},
+      { text: 'Cancelar', onPress: () => {
+        navigation.navigate('Home' as never);
+      }}
+    ]
+    );
   };
 
   return (

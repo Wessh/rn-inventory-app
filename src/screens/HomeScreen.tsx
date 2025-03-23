@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Platform, StatusBar, Modal } from 'react-native';
-import { getAllInventory, openDatabase, deleteData, getInventoryByFilters, getAvailableCategories, getAvailableMarcas } from '../database/simple_db';
+import { getAllInventory, openDatabase, deleteData, getInventoryByFilters, getAvailableCategories, getAvailableMarcas, getAppName } from '../database/simple_db';
 import AddItemModal from '../modals/AddItemModal';
 import { Picker } from '@react-native-picker/picker';
 import { Button, TextInput, FAB } from 'react-native-paper';
@@ -10,6 +10,7 @@ import styles from '../styles/styles'; // Importe os estilos do arquivo styles.t
 import { Button as PaperButton } from 'react-native-paper';
 import SettingsScreen from './SettingsScreen';
 import { useNavigation } from '@react-navigation/native';
+import { AppContext } from '../AppContext';
 
 interface InventoryItem {
   id: number;
@@ -19,7 +20,8 @@ interface InventoryItem {
   quantidade: number;
 }
 
-const HomeScreen = () => {
+const HomeScreen: React.FC = () => {
+  const { appName } = useContext(AppContext);
   const navigation = useNavigation();
   const [search, setSearch] = useState('');
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
