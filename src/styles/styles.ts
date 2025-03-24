@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
+    padding:8,
   },
   title: {
     fontSize: 28,
@@ -17,8 +17,12 @@ const styles = StyleSheet.create({
     color: '#34495e', // Cor do título
   },
   searchInput: {
+    marginTop: -8,
     marginBottom: 15,
     backgroundColor: '#fff',
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
   },
   filterContainer: {
     flexDirection: 'row',
@@ -60,7 +64,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // Alinha os itens horizontalmente
     justifyContent: 'space-between', // Espaço entre os itens
     alignItems: 'center', // Centraliza verticalmente
-    paddingHorizontal: 20, // Adiciona padding horizontal
+    paddingHorizontal: 8, // Adiciona padding horizontal
+    paddingVertical: 8, // Adiciona padding vertical
   },
   itemInfo: {
     flex: 1,
@@ -94,6 +99,11 @@ const styles = StyleSheet.create({
   },
   listContentContainer: {
     paddingBottom: 10,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    width: '100%',
+    height: '100%',
+    padding: 8,
   },
   fab: {
     position: 'absolute',
@@ -105,9 +115,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalView: {
+    margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
@@ -120,7 +130,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    width: '80%',
+    width: '80%', // Define a largura do modal
   },
   modalTitle: {
     fontSize: 20,
@@ -128,12 +138,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   input: {
-    height: 40,
+    height: 50,
     borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 10,
     paddingLeft: 10,
     width: '100%',
+    fontSize: 16,
   },
   filterTextInput: {
     height: 40,
@@ -173,6 +184,49 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: 60,
     textAlign: 'center',
+    borderRadius: 5,
+    alignItems: 'center'
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo semi-transparente
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%', // Ajuste a largura conforme necessário
+    maxHeight: '80%', // Ajuste a altura conforme necessário
+    alignItems: 'center',
+    elevation: 5, // Adiciona uma sombra
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  settingsButton: {
+    padding: 10,
+  },
+  filterButton: {
+    width: 100, // Ajuste a largura conforme necessário
+  },
+  emptyListContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  emptyListText: {
+    fontSize: 16,
+    color: '#000',//'#8e44ad',
   },
 });
 

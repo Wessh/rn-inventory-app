@@ -1,11 +1,23 @@
 import * as SQLite from 'expo-sqlite';
 
+
+export interface InventoryItem {
+  id: number;
+  nome: string;
+  marca: string;
+  categoria: string;
+  quantidade: number;
+}
+
 let db: SQLite.SQLiteDatabase;
 
 async function openDatabase() {
   db = await SQLite.openDatabaseAsync('inventory-app');
 
   await db.execAsync(`
+    --DROP TABLE IF EXISTS app_settings;
+    --DROP TABLE IF EXISTS inventory;
+
     PRAGMA journal_mode = WAL; 
     CREATE TABLE IF NOT EXISTS inventory (
     id INTEGER PRIMARY KEY NOT NULL, 
@@ -13,10 +25,38 @@ async function openDatabase() {
     marca TEXT, 
     categoria TEXT,
     quantidade INTEGER
-    );`);
+    );
+
+    CREATE TABLE IF NOT EXISTS app_settings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      app_name TEXT NOT NULL
+    );
+
+    INSERT INTO app_settings (app_name) 
+    SELECT 'Inventário'
+    WHERE NOT EXISTS (
+      SELECT 1 FROM app_settings WHERE id = 1
+    );
+    `);
+
 }
 // Exporta a função openDatabase para ser chamada externamente
 export { openDatabase };
+
+export async function getAppName() {
+  if (!db) {
+    await openDatabase();
+  }
+  const result: any = await db.getFirstAsync('SELECT app_name FROM app_settings');
+  return result.app_name;
+}
+
+export async function updateAppName(app_name: string) {
+  if (!db) {
+    await openDatabase();
+  }
+  await db.runAsync('UPDATE app_settings SET app_name = ? WHERE id = 1', app_name);
+}
 // Exporta a função insertData para ser chamada externamente
 export async function insertData(nome: string, marca: string, categoria: string, quantidade: number) {
   if (!db) {
@@ -50,6 +90,7 @@ export async function insertData(nome: string, marca: string, categoria: string,
     console.error('Failed to insert data', e);
   }
 }
+
 // Exporta a função para fechar o banco de dados
 export async function closeDatabase() {
   if (db) {
@@ -58,33 +99,12 @@ export async function closeDatabase() {
   }
 }
 
-export async function clearInventoryTable() {
-    if (!db) {
-      await openDatabase(); // Garante que o banco de dados esteja aberto
-    }
-    try {
-      await db.execAsync('DELETE FROM inventory');
-      console.log('Tabela inventory limpa com sucesso!');
-    } catch (e) {
-      console.error('Erro ao limpar a tabela inventory:', e);
-    }
-}
-
-export interface InventoryItem {
-  id: number;
-  nome: string;
-  marca: string;
-  categoria: string;
-  quantidade: number;
-}
-
 export async function getAllInventory(): Promise<InventoryItem[]> {
   if (!db) {
     await openDatabase(); // Garante que o banco de dados esteja aberto
   }
   try {
     const result = await db.getAllAsync('SELECT * FROM inventory');
-    console.log(result);
     return result as InventoryItem[]; // Retorna o resultado como um array de InventoryItem
   } catch (e) {
     console.error('Erro ao obter todos os itens do inventário:', e);
@@ -308,6 +328,17 @@ export async function getAvailableMarcas(): Promise<string[]> {
     return [];
   }
 }
+
+export const saveAppName = async (appName: string): Promise<void> => {
+  try {
+    if (!db) {
+      await openDatabase();
+    }
+    await db.runAsync('UPDATE app_settings SET app_name = ? WHERE id = 1', [appName]);
+  } catch (error) {
+    console.error('Erro ao salvar o nome do app:', error);
+  }
+};
 
 
 

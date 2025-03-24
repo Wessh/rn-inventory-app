@@ -1,28 +1,41 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, SafeAreaView, Alert, Platform, StatusBar } from 'react-native';
-import { getAllInventory, openDatabase, deleteData, getInventoryByFilters, getAvailableCategories, getAvailableMarcas } from '../database/simple_db';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Platform, StatusBar, Modal } from 'react-native';
+import { getAllInventory, openDatabase, deleteData, getInventoryByFilters, getAvailableCategories, getAvailableMarcas, getAppName } from '../database/simple_db';
 import AddItemModal from '../modals/AddItemModal';
-import FilterModal from '../modals/FilterModal';
-import InventoryItemComponent from '../components/InventoryItemComponent';
-import { Button, TextInput as PaperTextInput, FAB } from 'react-native-paper';
+import { Picker } from '@react-native-picker/picker';
+import { Button, TextInput, FAB } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import styles from '../styles/styles'; // Importe os estilos do arquivo styles.ts
 import { Button as PaperButton } from 'react-native-paper';
-import { InventoryItem } from '../types';
+import SettingsScreen from './SettingsScreen';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { AppContext } from '../AppContext';
 
-const HomeScreen = () => {
+interface InventoryItem {
+  id: number;
+  nome: string;
+  marca: string;
+  categoria: string;
+  quantidade: number;
+}
+
+const HomeScreen: React.FC = () => {
+  const { appName } = useContext(AppContext);
+  const navigation = useNavigation();
   const [search, setSearch] = useState('');
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedMarca, setSelectedMarca] = useState('');
-  const [selectedQuantity, setSelectedQuantity] = useState('');
-  const [selectedQuantityFilter, setSelectedQuantityFilter] = useState('eq');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedMarca, setSelectedMarca] = useState<string>('');
+  const [selectedQuantity, setSelectedQuantity] = useState<string>('');
+  const [selectedQuantityFilter, setSelectedQuantityFilter] = useState<string>('');
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [availableMarcas, setAvailableMarcas] = useState<string[]>([]);
   const [filterDialogVisible, setFilterDialogVisible] = useState(false);
+  const [filterQuantity, setFilterQuantity] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     loadInventory();
@@ -33,13 +46,25 @@ const HomeScreen = () => {
     loadInventory();
   }, [search, selectedCategory, selectedMarca, selectedQuantity, selectedQuantityFilter]);
 
-  const loadInventory = useCallback(async () => {
+  useFocusEffect(
+    useCallback(() => {
+      loadFilters();
+    }, [])
+  );
+
+  const loadInventory = async () => {
+    setIsLoading(true);
     try {
       await openDatabase();
-      const data = await getInventoryByFilters(selectedCategory, selectedMarca, selectedQuantity, selectedQuantityFilter);
-      let filteredData = data;
+      const inventory = await getInventoryByFilters(
+        selectedCategory,
+        selectedMarca,
+        selectedQuantityFilter !== '' ? filterQuantity.toString() : '',
+        selectedQuantityFilter
+      );
+      let filteredData = inventory;
       if (search) {
-        filteredData = data.filter(item =>
+        filteredData = inventory.filter(item =>
           item.nome.toLowerCase().includes(search.toLowerCase()) ||
           item.marca.toLowerCase().includes(search.toLowerCase()) ||
           item.categoria.toLowerCase().includes(search.toLowerCase())
@@ -48,10 +73,12 @@ const HomeScreen = () => {
       setInventory(filteredData);
     } catch (error) {
       console.error('Erro ao carregar o inventário:', error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [search, selectedCategory, selectedMarca, selectedQuantity, selectedQuantityFilter]);
+  };
 
-  const loadFilters = useCallback(async () => {
+  const loadFilters = async () => {
     try {
       await openDatabase();
       // Assuming you have functions to fetch available categories and marcas
@@ -62,7 +89,7 @@ const HomeScreen = () => {
     } catch (error) {
       console.error('Erro ao carregar os filtros:', error);
     }
-  }, []);
+  };
 
   const handleAddItem = () => {
     setSelectedItem(null); // Reset selected item when adding a new item
@@ -76,6 +103,7 @@ const HomeScreen = () => {
 
   const handleItemAdded = () => {
     loadInventory(); // Recarrega os itens após adicionar um novo
+    loadFilters(); // Recarrega os filtros após adicionar um novo item
   };
 
   const handleSelectItem = (item: InventoryItem) => {
@@ -109,7 +137,22 @@ const HomeScreen = () => {
   };
 
   const renderItem = ({ item }: { item: InventoryItem }) => (
-    <InventoryItemComponent item={item} onSelectItem={handleSelectItem} onDeleteItem={handleDeleteItem} />
+    <View style={styles.itemContainer}>
+      <TouchableOpacity style={styles.itemInfo} onPress={() => handleSelectItem(item)}>
+        <Text style={styles.itemName}>Nome: {item.nome}</Text>
+        <Text style={styles.itemDetails}>Marca: {item.marca}</Text>
+        <Text style={styles.itemDetails}>Categoria: {item.categoria}</Text>
+        <Text style={styles.itemDetails}>Quantidade: {item.quantidade}</Text>
+      </TouchableOpacity>
+      <View style={styles.itemButtons}>
+        <TouchableOpacity style={styles.editButton} onPress={() => handleSelectItem(item)}>
+          <MaterialCommunityIcons name="pencil" size={20} color="#3498db" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleDeleteItem(item.id)}>
+          <MaterialCommunityIcons name="trash-can" size={20} color="#e74c3c" />
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 
   const showFilterDialog = () => setFilterDialogVisible(true);
@@ -120,35 +163,63 @@ const HomeScreen = () => {
     setSelectedCategory('');
     setSelectedMarca('');
     setSelectedQuantity('');
-    setSelectedQuantityFilter('eq');
+    setSelectedQuantityFilter('');
+    setFilterQuantity(0);
     loadInventory();
     hideFilterDialog();
   };
 
-  const handleQuantityChange = (quantity: string) => {
-    setSelectedQuantity(quantity);
+  const clearCategoryFilter = () => {
+    setSelectedCategory('');
+    loadInventory();
+  };
+
+  const clearMarcaFilter = () => {
+    setSelectedMarca('');
+    loadInventory();
+  };
+
+  const handleFilterIncrement = () => {
+    setFilterQuantity(filterQuantity + 1);
+  };
+
+  const handleFilterDecrement = () => {
+    if (filterQuantity > 0) {
+      setFilterQuantity(filterQuantity - 1);
+    }
+  };
+
+  const handleFilterQuantityChange = (text: string) => {
+    const numericValue = text.replace(/[^0-9]/g, '');
+    const parsedValue = parseInt(numericValue, 10);
+    setFilterQuantity(isNaN(parsedValue) ? 0 : parsedValue);
+  };
+
+  const clearQuantityFilter = () => {
+    setSelectedQuantity('');
+    setSelectedQuantityFilter('');
+    setFilterQuantity(0);
+    loadInventory();
   };
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
         <View style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
-          <Text style={[styles.title, { textAlign: 'center' }]}>Inventário</Text>
-          <PaperTextInput
+          <TextInput
             style={styles.searchInput}
             placeholder="Pesquisar item..."
             value={search}
             onChangeText={setSearch}
-            mode="outlined"
           />
 
           <View style={styles.filterContainer}>
-            <Button mode="contained" onPress={showFilterDialog} buttonColor="#e0daf7" textColor="#000">Filtros</Button>
+            <Button mode="contained" onPress={showFilterDialog} buttonColor="#e0daf7" textColor="#000" style={styles.filterButton}>Filtros</Button>
             <View style={styles.filterInfoContainer}>
               {selectedCategory !== '' && (
                 <View style={styles.filterItemContainer}>
                   <Text style={styles.filterText}>Categoria: {selectedCategory}</Text>
-                  <TouchableOpacity onPress={() => setSelectedCategory('')}>
+                  <TouchableOpacity onPress={() => clearCategoryFilter()}>
                     <Text style={styles.clearFilterButton}>X</Text>
                   </TouchableOpacity>
                 </View>
@@ -156,15 +227,15 @@ const HomeScreen = () => {
               {selectedMarca !== '' && (
                 <View style={styles.filterItemContainer}>
                   <Text style={styles.filterText}>Marca: {selectedMarca}</Text>
-                  <TouchableOpacity onPress={() => setSelectedMarca('')}>
+                  <TouchableOpacity onPress={() => clearMarcaFilter()}>
                     <Text style={styles.clearFilterButton}>X</Text>
                   </TouchableOpacity>
                 </View>
               )}
-              {selectedQuantity !== '' && (
+              {selectedQuantity !== '' && selectedQuantityFilter !== '' && (
                 <View style={styles.filterItemContainer}>
                   <Text style={styles.filterText}>Quantidade: {selectedQuantity} ({selectedQuantityFilter})</Text>
-                  <TouchableOpacity onPress={() => clearFilters()}>
+                  <TouchableOpacity onPress={() => clearQuantityFilter()}>
                     <Text style={styles.clearFilterButton}>X</Text>
                   </TouchableOpacity>
                 </View>
@@ -177,6 +248,11 @@ const HomeScreen = () => {
             renderItem={renderItem}
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.listContentContainer}
+            ListEmptyComponent={() => (
+              <View style={styles.emptyListContainer}>
+                <Text style={styles.emptyListText}>Não possui registro de itens!</Text>
+              </View>
+            )}
           />
 
           <AddItemModal
@@ -186,22 +262,75 @@ const HomeScreen = () => {
             selectedItem={selectedItem} // Pass the selected item to the modal
           />
 
-          <FilterModal
+          <Modal
+            animationType="slide"
+            transparent={true}
             visible={filterDialogVisible}
-            onClose={hideFilterDialog}
-            selectedCategory={selectedCategory}
-            selectedMarca={selectedMarca}
-            selectedQuantity={selectedQuantity}
-            selectedQuantityFilter={selectedQuantityFilter}
-            availableCategories={availableCategories}
-            availableMarcas={availableMarcas}
-            setSelectedCategory={setSelectedCategory}
-            setSelectedMarca={setSelectedMarca}
-            setSelectedQuantity={handleQuantityChange}
-            setSelectedQuantityFilter={setSelectedQuantityFilter}
-            loadInventory={loadInventory}
-            clearFilters={clearFilters}
-          />
+            onRequestClose={hideFilterDialog}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalTitle}>Filtros</Text>
+                <Picker
+                  selectedValue={selectedCategory}
+                  style={styles.picker}
+                  onValueChange={(itemValue: string) => {
+                    setSelectedCategory(itemValue);
+                  }}
+                >
+                  <Picker.Item label="Todas as Categorias" value="" />
+                  {availableCategories.map((category: string) => (
+                    <Picker.Item key={category} label={category} value={category} />
+                  ))}
+                </Picker>
+
+                <Picker
+                  selectedValue={selectedMarca}
+                  style={styles.picker}
+                  onValueChange={(itemValue: string) => {
+                    setSelectedMarca(itemValue);
+                  }}
+                >
+                  <Picker.Item label="Todas as Marcas" value="" />
+                  {availableMarcas.map((marca: string) => (
+                    <Picker.Item key={marca} label={marca} value={marca} />
+                  ))}
+                </Picker>
+
+                <View style={styles.quantityContainer}>
+                  <PaperButton mode="contained" buttonColor="#e0daf7" textColor="#000" onPress={handleFilterDecrement}>-</PaperButton>
+                  <TextInput
+                    style={styles.quantityInput}
+                    value={filterQuantity.toString()}
+                    onChangeText={handleFilterQuantityChange}
+                    keyboardType="number-pad"
+                  />
+                  <PaperButton mode="contained" buttonColor="#e0daf7" textColor="#000" onPress={handleFilterIncrement}>+</PaperButton>
+                </View>
+                <Picker
+                  selectedValue={selectedQuantityFilter}
+                  style={styles.picker}
+                  onValueChange={(itemValue: string) => {
+                    setSelectedQuantityFilter(itemValue);
+                  }}
+                >
+                  <Picker.Item label="Todas as Quantidades" value="" />
+                  <Picker.Item label="Igual a" value="eq" />
+                  <Picker.Item label="Maior ou igual a" value="gte" />
+                  <Picker.Item label="Menor ou igual a" value="lte" />
+                </Picker>
+                <View style={styles.buttonContainer}>
+                <Button onPress={() => {
+                    setSelectedQuantity(filterQuantity.toString());
+                    loadInventory();
+                    hideFilterDialog();
+                  }} buttonColor="#e0daf7" textColor="#000">Aplicar</Button>
+                  <Button onPress={hideFilterDialog} buttonColor="#e0daf7" textColor="#000">Cancelar</Button>
+                  <Button onPress={clearFilters} buttonColor="#e0daf7" textColor="#000">Limpar</Button>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
         <FAB
           style={[styles.fab, { backgroundColor: '#e0daf7' }]}
@@ -214,4 +343,4 @@ const HomeScreen = () => {
   );
 };
 
-export default HomeScreen; 
+export default HomeScreen;
