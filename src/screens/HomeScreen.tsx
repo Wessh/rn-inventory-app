@@ -320,14 +320,12 @@ const HomeScreen: React.FC = () => {
                   <Picker.Item label="Menor ou igual a" value="lte" />
                 </Picker>
                 <View style={styles.buttonContainer}>
-                  <Button onPress={hideFilterDialog} buttonColor="#e0daf7" textColor="#000">Cancelar</Button>
-                  <Button onPress={() => {
+                <Button onPress={() => {
                     setSelectedQuantity(filterQuantity.toString());
                     loadInventory();
                     hideFilterDialog();
                   }} buttonColor="#e0daf7" textColor="#000">Aplicar</Button>
-                </View>
-                <View style={styles.clearButtonContainer}>
+                  <Button onPress={hideFilterDialog} buttonColor="#e0daf7" textColor="#000">Cancelar</Button>
                   <Button onPress={clearFilters} buttonColor="#e0daf7" textColor="#000">Limpar</Button>
                 </View>
               </View>

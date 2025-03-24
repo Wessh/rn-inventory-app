@@ -1,5 +1,14 @@
 import * as SQLite from 'expo-sqlite';
 
+
+export interface InventoryItem {
+  id: number;
+  nome: string;
+  marca: string;
+  categoria: string;
+  quantidade: number;
+}
+
 let db: SQLite.SQLiteDatabase;
 
 async function openDatabase() {
@@ -81,6 +90,7 @@ export async function insertData(nome: string, marca: string, categoria: string,
     console.error('Failed to insert data', e);
   }
 }
+
 // Exporta a função para fechar o banco de dados
 export async function closeDatabase() {
   if (db) {
@@ -89,33 +99,12 @@ export async function closeDatabase() {
   }
 }
 
-export async function clearInventoryTable() {
-    if (!db) {
-      await openDatabase(); // Garante que o banco de dados esteja aberto
-    }
-    try {
-      await db.execAsync('DELETE FROM inventory');
-      console.log('Tabela inventory limpa com sucesso!');
-    } catch (e) {
-      console.error('Erro ao limpar a tabela inventory:', e);
-    }
-}
-
-export interface InventoryItem {
-  id: number;
-  nome: string;
-  marca: string;
-  categoria: string;
-  quantidade: number;
-}
-
 export async function getAllInventory(): Promise<InventoryItem[]> {
   if (!db) {
     await openDatabase(); // Garante que o banco de dados esteja aberto
   }
   try {
     const result = await db.getAllAsync('SELECT * FROM inventory');
-    console.log(result);
     return result as InventoryItem[]; // Retorna o resultado como um array de InventoryItem
   } catch (e) {
     console.error('Erro ao obter todos os itens do inventário:', e);

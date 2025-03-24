@@ -79,7 +79,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ visible, onClose, onAddItem
         // Se selectedItem não existe, estamos adicionando um novo item
         const result = await insertData(trimmedNome, trimmedMarca, trimmedCategoria, quantidade);
         
-        if (result && result.id) {
+        if (result && (result as any).id) {
           // Item duplicado encontrado
           Alert.alert(
             'Item Duplicado',
@@ -92,8 +92,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ visible, onClose, onAddItem
               {
                 text: 'Somar',
                 onPress: async () => {
-                  const newQuantity = result.quantidade + quantidade;
-                  await updateData(result.id, trimmedNome, trimmedMarca, trimmedCategoria, newQuantity);
+                  const newQuantity = (result as any).quantidade + quantidade;
+                  await updateData((result as any).id, trimmedNome, trimmedMarca, trimmedCategoria, newQuantity);
                   onAddItem();
                   onClose();
                 },

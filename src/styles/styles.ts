@@ -184,6 +184,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: 60,
     textAlign: 'center',
+    borderRadius: 5,
+    alignItems: 'center'
   },
   modalOverlay: {
     flex: 1,

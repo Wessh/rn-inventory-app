@@ -44,7 +44,6 @@ const SettingsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
-        <Text style={[styles.title, { textAlign: 'center' }]}>Configurações</Text>
         <Text style={styles.label}>Nome do App:</Text>
         <TextInput
           style={styles.input}
@@ -54,7 +53,7 @@ const SettingsScreen: React.FC = () => {
         />
         <View style={styles.buttonContainer}>
           <Button mode="contained" buttonColor="#e0daf7" textColor="#000" onPress={handleSaveAppName}>
-            Salvar Nome
+            Salvar
           </Button>
         </View>
       </View>
